@@ -7,6 +7,8 @@ import type { ClientConversion } from '~/lib/catalog/types';
 export interface Capability {
   ok: boolean;
   message?: string;
+  /** Stable reason, so the UI can explain it in the page language. */
+  reason?: 'file-apis' | 'image-apis' | 'avif';
 }
 
 // 1×1 AVIF used to probe native decoding support.
@@ -30,18 +32,21 @@ export async function checkCapabilities(c: ClientConversion): Promise<Capability
   )
     return {
       ok: false,
+      reason: 'file-apis',
       message:
         'Your browser is missing basic file APIs needed for in-browser conversion. Please update it.',
     };
   if ((c.engine === 'image' || c.engine === 'pdf') && typeof createImageBitmap === 'undefined')
     return {
       ok: false,
+      reason: 'image-apis',
       message:
         'Your browser cannot process images in the page (createImageBitmap is missing). Please update to a current browser.',
     };
   if (c.from === 'avif' && !(await probeImage(AVIF_PROBE)))
     return {
       ok: false,
+      reason: 'avif',
       message:
         'This browser cannot decode AVIF images, so they cannot be converted here. AVIF works in current Chrome, Edge, Firefox (93+) and Safari (16.4+).',
     };

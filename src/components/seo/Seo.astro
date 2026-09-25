@@ -10,10 +10,16 @@ const m = resolveMeta(Astro.props.meta);
 <title>{m.title}</title>
 <meta name="description" content={m.description} />
 <link rel="canonical" href={m.canonical} />
+{m.alternates.map((a) => (
+  <link rel="alternate" hreflang={a.hreflang} href={a.href} />
+))}
 <meta name="robots" content={m.robots} />
 <meta property="og:type" content={m.og.type} />
 <meta property="og:site_name" content={m.og.siteName} />
 <meta property="og:locale" content={m.og.locale} />
+{m.og.localeAlternates.map((l) => (
+  <meta property="og:locale:alternate" content={l} />
+))}
 <meta property="og:title" content={m.og.title} />
 <meta property="og:description" content={m.og.description} />
 <meta property="og:url" content={m.og.url} />

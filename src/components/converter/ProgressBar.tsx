@@ -1,3 +1,5 @@
+import { localizeProgress, useUi } from './i18n';
+
 interface Props {
   fraction: number;
   label?: string | undefined;
@@ -5,6 +7,7 @@ interface Props {
 }
 
 export function ProgressBar({ fraction, label, onCancel }: Props) {
+  const t = useUi();
   const pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100);
   const indeterminate = pct === 0;
   return (
@@ -13,7 +16,7 @@ export function ProgressBar({ fraction, label, onCancel }: Props) {
         <div className="mb-2 flex items-baseline justify-between gap-3 text-[13px]">
           <span className="flex items-center gap-2 truncate font-medium text-fg">
             <span className="dot animate-pulse bg-dot-blue" aria-hidden="true" />
-            {label ?? 'Converting…'}
+            {localizeProgress(label, t) ?? t.converting}
           </span>
           <span className="font-mono text-fg-3" aria-hidden="true">
             {indeterminate ? '' : `${pct}%`}
@@ -22,11 +25,11 @@ export function ProgressBar({ fraction, label, onCancel }: Props) {
         <div
           className="h-1.5 overflow-hidden rounded-full bg-surface-2 shadow-border"
           role="progressbar"
-          aria-label="Conversion progress"
+          aria-label={t.progress.label}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={indeterminate ? undefined : pct}
-          aria-valuetext={indeterminate ? 'Starting' : `${pct}%`}
+          aria-valuetext={indeterminate ? t.progress.starting : `${pct}%`}
         >
           {indeterminate ? (
             <div className="h-full w-2/5 rounded-full bg-fg [animation:fz-indeterminate_1.1s_ease-in-out_infinite]" />
@@ -39,7 +42,7 @@ export function ProgressBar({ fraction, label, onCancel }: Props) {
         </div>
       </div>
       <button type="button" className="btn btn-secondary btn-sm" onClick={onCancel}>
-        Cancel
+        {t.progress.cancel}
       </button>
     </div>
   );

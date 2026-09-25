@@ -1,0 +1,40 @@
+{
+  "id": [
+    { "conversion": "heic-to-jpg", "slug": "heic-ke-jpg", "keyword": "heic ke jpg" },
+    { "conversion": "heic-to-png", "slug": "heic-ke-png", "keyword": "heic ke png" },
+    { "conversion": "heic-to-pdf", "slug": "heic-ke-pdf", "keyword": "heic ke pdf" },
+    { "conversion": "webp-to-jpg", "slug": "webp-ke-jpg", "keyword": "webp ke jpg" },
+    { "conversion": "webp-to-png", "slug": "webp-ke-png", "keyword": "webp ke png" },
+    { "conversion": "avif-to-jpg", "slug": "avif-ke-jpg", "keyword": "avif ke jpg" },
+    { "conversion": "pdf-to-jpg", "slug": "pdf-ke-jpg", "keyword": "pdf ke jpg" },
+    { "conversion": "jpg-to-pdf", "slug": "jpg-ke-pdf", "keyword": "jpg ke pdf" },
+    { "conversion": "srt-to-vtt", "slug": "srt-ke-vtt", "keyword": "srt ke vtt" },
+    { "conversion": "vtt-to-srt", "slug": "vtt-ke-srt", "keyword": "vtt ke srt" }
+  ],
+  "vi": [
+    { "conversion": "heic-to-jpg", "slug": "heic-sang-jpg", "keyword": "heic sang jpg" },
+    { "conversion": "heic-to-png", "slug": "heic-sang-png", "keyword": "heic sang png" },
+    { "conversion": "webp-to-jpg", "slug": "webp-sang-jpg", "keyword": "webp sang jpg" },
+    { "conversion": "pdf-to-jpg", "slug": "pdf-sang-jpg", "keyword": "pdf sang jpg" },
+    { "conversion": "jpg-to-pdf", "slug": "jpg-sang-pdf", "keyword": "jpg sang pdf" },
+    { "conversion": "srt-to-vtt", "slug": "srt-sang-vtt", "keyword": "srt sang vtt" },
+    { "conversion": "vtt-to-srt", "slug": "vtt-sang-srt", "keyword": "vtt sang srt" }
+  ],
+  "tr": [
+    { "conversion": "heic-to-jpg", "slug": "heic-jpg-cevirme", "keyword": "heic jpg çevirme" },
+    { "conversion": "heic-to-png", "slug": "heic-png-cevirme", "keyword": "heic png çevirme" },
+    { "conversion": "heic-to-pdf", "slug": "heic-pdf-cevirme", "keyword": "heic pdf çevirme" },
+    { "conversion": "webp-to-jpg", "slug": "webp-jpg-cevirme", "keyword": "webp jpg çevirme" },
+    { "conversion": "pdf-to-jpg", "slug": "pdf-jpg-cevirme", "keyword": "pdf jpg çevirme" },
+    { "conversion": "jpg-to-pdf", "slug": "jpg-pdf-cevirme", "keyword": "jpg pdf çevirme" },
+    { "conversion": "srt-to-vtt", "slug": "srt-vtt-cevirme", "keyword": "srt vtt çevirme" },
+    { "conversion": "vtt-to-srt", "slug": "vtt-srt-cevirme", "keyword": "vtt srt çevirme" },
+    { "conversion": "csv-to-json", "slug": "csv-json-donusturme", "keyword": "csv json dönüştürme" }
+  ],
+  "pt": [
+    { "conversion": "srt-to-vtt", "slug": "srt-para-vtt", "keyword": "srt para vtt" },
+    { "conversion": "vtt-to-srt", "slug": "vtt-para-srt", "keyword": "vtt para srt" },
+    { "conversion": "csv-to-json", "slug": "csv-para-json", "keyword": "csv para json" },
+    { "conversion": "json-to-csv", "slug": "json-para-csv", "keyword": "json para csv" }
+  ]
+}

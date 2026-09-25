@@ -2,6 +2,8 @@ import { formatBytes } from '~/lib/file/format';
 import type { Item } from './useConverter';
 import { FilePreview } from './FilePreview';
 import { ArrowDownIcon, ArrowUpIcon, XIcon } from './icons';
+import { IssueBody } from './IssueBody';
+import { describeIssue, fmt, useUi } from './i18n';
 
 interface Props {
   items: Item[];
@@ -9,13 +11,16 @@ interface Props {
   disabled: boolean;
   onRemove: (id: string) => void;
   onMove: (id: string, delta: number) => void;
+  vars: { from: string; limit: string; max: number };
 }
 
-export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Props) {
+export function FileList({ items, orderMatters, disabled, onRemove, onMove, vars }: Props) {
+  const t = useUi();
+  const l = t.fileList;
   return (
     <ul
       className="divide-y divide-[var(--border)] overflow-hidden rounded-lg bg-surface shadow-border"
-      aria-label="Selected files"
+      aria-label={l.label}
     >
       {items.map((item, i) => (
         <li
@@ -35,8 +40,8 @@ export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Pr
               <p className="mt-0.5 flex items-start gap-1.5 text-[13px] text-fg-2">
                 <span className="dot mt-1.5 bg-dot-red" aria-hidden="true" />
                 <span>
-                  <span className="sr-only">Cannot convert: </span>
-                  {item.issue.message}
+                  <span className="sr-only">{l.cannotConvert}</span>
+                  <IssueBody issue={describeIssue(item.issue, t, vars)} />
                 </span>
               </p>
             ) : (
@@ -51,7 +56,7 @@ export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Pr
                   className="btn btn-ghost btn-icon"
                   onClick={() => onMove(item.id, -1)}
                   disabled={disabled || i === 0}
-                  aria-label={`Move ${item.file.name} up`}
+                  aria-label={fmt(l.moveUp, { name: item.file.name })}
                 >
                   <ArrowUpIcon />
                 </button>
@@ -60,7 +65,7 @@ export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Pr
                   className="btn btn-ghost btn-icon"
                   onClick={() => onMove(item.id, 1)}
                   disabled={disabled || i === items.length - 1}
-                  aria-label={`Move ${item.file.name} down`}
+                  aria-label={fmt(l.moveDown, { name: item.file.name })}
                 >
                   <ArrowDownIcon />
                 </button>
@@ -71,7 +76,7 @@ export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Pr
               className="btn btn-ghost btn-icon"
               onClick={() => onRemove(item.id)}
               disabled={disabled}
-              aria-label={`Remove ${item.file.name}`}
+              aria-label={fmt(l.remove, { name: item.file.name })}
             >
               <XIcon />
             </button>

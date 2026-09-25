@@ -3,6 +3,22 @@ import Logo from './Logo.astro';
 import { CATEGORY_LIST, getConversionMeta } from '~/lib/catalog/registry';
 import { SITE } from '~/config/site';
 import { ADS } from '~/config/ads';
+import { LOCALES, localeHomePath, type LocaleCode } from '~/i18n/locales';
+import { ACTIVE_LOCALES, localizedPagesFor } from '~/i18n/registry';
+import { PAGE_STRINGS } from '~/i18n/pages';
+
+interface Props {
+  locale?: LocaleCode;
+}
+const { locale = 'en' } = Astro.props;
+const ps = locale === 'en' ? null : PAGE_STRINGS[locale];
+const languages = (['en', ...ACTIVE_LOCALES] as LocaleCode[]).map((l) => ({
+  code: l,
+  href: localeHomePath(l),
+  name: LOCALES[l].nativeName,
+  hreflang: LOCALES[l].hreflang,
+}));
+const localTools = locale === 'en' ? [] : localizedPagesFor(locale);
 
 const popular = [
   'heic-to-jpg',
@@ -30,95 +46,201 @@ const legal = [
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-24 shadow-[0_-1px_0_0_var(--border)]">
-  <div class="container-page grid gap-10 py-12 md:grid-cols-[1.2fr_repeat(4,1fr)]">
-    <div class="max-w-xs">
-      <Logo />
-      <p class="mt-4 text-sm text-fg-2">
-        {SITE.tagline}. Supported files are processed by your browser and never uploaded to our
-        servers.
+{ps ? (
+  <footer class="mt-24 shadow-[0_-1px_0_0_var(--border)]">
+    <div class="container-page grid gap-10 py-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <div class="max-w-xs">
+        <Logo href={localeHomePath(locale)} label={`Formatoza — ${ps.home}`} />
+        <p class="mt-4 text-sm text-fg-2">{ps.footer.tagline}</p>
+      </div>
+      <nav aria-labelledby="ft-tools">
+        <h2 id="ft-tools" class="text-sm font-medium text-fg">
+          {ps.allTools}
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {localTools.map((p) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={p.path}>
+                {p.meta.source.name} → {p.meta.target.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-labelledby="ft-lang">
+        <h2 id="ft-lang" class="text-sm font-medium text-fg">
+          {ps.footer.languages}
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {languages.map((l) => (
+            <li>
+              <a
+                class="text-fg-2 hover:text-fg"
+                href={l.href}
+                hreflang={l.hreflang}
+                lang={l.hreflang}
+                aria-current={l.code === locale ? 'page' : undefined}
+              >
+                {l.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-labelledby="ft-legal">
+        <h2 id="ft-legal" class="text-sm font-medium text-fg">
+          {ps.footer.policies}
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {[
+            { href: '/privacy/', label: ps.footer.privacy },
+            { href: '/cookies/', label: ps.footer.cookies },
+            { href: '/terms/', label: ps.footer.terms },
+            { href: '/about/', label: ps.footer.aboutUs },
+            { href: '/contact/', label: ps.footer.contactUs },
+          ].map((l) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={l.href} hreflang="en">
+                {l.label}
+              </a>
+            </li>
+          ))}
+          {ADS.enabled && (
+            <li>
+              <button type="button" class="text-left text-fg-2 hover:text-fg" data-privacy-choices>
+                Privacy choices
+              </button>
+            </li>
+          )}
+        </ul>
+        <p class="mt-3 text-xs text-fg-3">{ps.footer.englishNote}</p>
+      </nav>
+    </div>
+    <div class="container-page flex flex-col gap-2 py-6 text-xs text-fg-3 shadow-[0_-1px_0_0_var(--border)] sm:flex-row sm:justify-between">
+      <p>
+        © {year} {SITE.name}
+      </p>
+      <p>
+        <a class="hover:text-fg" href={`mailto:${SITE.contactEmail}`}>
+          {SITE.contactEmail}
+        </a>
       </p>
     </div>
-    <nav aria-labelledby="ft-cat">
-      <h2 id="ft-cat" class="text-sm font-medium text-fg">
-        Converters
-      </h2>
-      <ul class="mt-3 grid gap-2 text-sm">
-        {CATEGORY_LIST.map((c) => (
-          <li>
-            <a class="text-fg-2 hover:text-fg" href={`/${c.path}/`}>
-              {c.name}
-            </a>
-          </li>
-        ))}
-        <li>
-          <a class="text-fg-2 hover:text-fg" href="/guides/">
-            Guides
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <nav aria-labelledby="ft-pop">
-      <h2 id="ft-pop" class="text-sm font-medium text-fg">
-        Popular
-      </h2>
-      <ul class="mt-3 grid gap-2 text-sm">
-        {popular.map((c) => (
-          <li>
-            <a class="text-fg-2 hover:text-fg" href={c.path}>
-              {c.h1.replace(/ Converter$/, '')}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-    <nav aria-labelledby="ft-co">
-      <h2 id="ft-co" class="text-sm font-medium text-fg">
-        Formatoza
-      </h2>
-      <ul class="mt-3 grid gap-2 text-sm">
-        {company.map((l) => (
-          <li>
-            <a class="text-fg-2 hover:text-fg" href={l.href}>
-              {l.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-    <nav aria-labelledby="ft-legal">
-      <h2 id="ft-legal" class="text-sm font-medium text-fg">
-        Legal
-      </h2>
-      <ul class="mt-3 grid gap-2 text-sm">
-        {legal.map((l) => (
-          <li>
-            <a class="text-fg-2 hover:text-fg" href={l.href}>
-              {l.label}
-            </a>
-          </li>
-        ))}
-        {ADS.enabled && (
-          <li>
-            <button type="button" class="text-left text-fg-2 hover:text-fg" data-privacy-choices>
-              Privacy choices
-            </button>
-          </li>
+  </footer>
+) : (
+  <footer class="mt-24 shadow-[0_-1px_0_0_var(--border)]">
+    <div class="container-page grid gap-10 py-12 md:grid-cols-[1.2fr_repeat(4,1fr)]">
+      <div class="max-w-xs">
+        <Logo />
+        <p class="mt-4 text-sm text-fg-2">
+          {SITE.tagline}. Supported files are processed by your browser and never uploaded to our
+          servers.
+        </p>
+        {languages.length > 1 && (
+          <nav aria-labelledby="ft-lang" class="mt-6">
+            <h2 id="ft-lang" class="text-sm font-medium text-fg">
+              Other languages
+            </h2>
+            <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+              {languages
+                .filter((l) => l.code !== 'en')
+                .map((l) => (
+                  <li>
+                    <a
+                      class="text-fg-2 hover:text-fg"
+                      href={l.href}
+                      hreflang={l.hreflang}
+                      lang={l.hreflang}
+                    >
+                      {l.name}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </nav>
         )}
-      </ul>
-    </nav>
-  </div>
-  <div class="container-page flex flex-col gap-2 py-6 text-xs text-fg-3 shadow-[0_-1px_0_0_var(--border)] sm:flex-row sm:justify-between">
-    <p>
-      © {year} {SITE.name}. Free to use. No account needed.
-    </p>
-    <p>
-      <a class="hover:text-fg" href={`mailto:${SITE.contactEmail}`}>
-        {SITE.contactEmail}
-      </a>
-    </p>
-  </div>
-</footer>
+      </div>
+      <nav aria-labelledby="ft-cat">
+        <h2 id="ft-cat" class="text-sm font-medium text-fg">
+          Converters
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {CATEGORY_LIST.map((c) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={`/${c.path}/`}>
+                {c.name}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a class="text-fg-2 hover:text-fg" href="/guides/">
+              Guides
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="ft-pop">
+        <h2 id="ft-pop" class="text-sm font-medium text-fg">
+          Popular
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {popular.map((c) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={c.path}>
+                {c.h1.replace(/ Converter$/, '')}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-labelledby="ft-co">
+        <h2 id="ft-co" class="text-sm font-medium text-fg">
+          Formatoza
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {company.map((l) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={l.href}>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <nav aria-labelledby="ft-legal">
+        <h2 id="ft-legal" class="text-sm font-medium text-fg">
+          Legal
+        </h2>
+        <ul class="mt-3 grid gap-2 text-sm">
+          {legal.map((l) => (
+            <li>
+              <a class="text-fg-2 hover:text-fg" href={l.href}>
+                {l.label}
+              </a>
+            </li>
+          ))}
+          {ADS.enabled && (
+            <li>
+              <button type="button" class="text-left text-fg-2 hover:text-fg" data-privacy-choices>
+                Privacy choices
+              </button>
+            </li>
+          )}
+        </ul>
+      </nav>
+    </div>
+    <div class="container-page flex flex-col gap-2 py-6 text-xs text-fg-3 shadow-[0_-1px_0_0_var(--border)] sm:flex-row sm:justify-between">
+      <p>
+        © {year} {SITE.name}. Free to use. No account needed.
+      </p>
+      <p>
+        <a class="hover:text-fg" href={`mailto:${SITE.contactEmail}`}>
+          {SITE.contactEmail}
+        </a>
+      </p>
+    </div>
+  </footer>
+)}
 
 {ADS.enabled && <script>
   document.querySelector('[data-privacy-choices]')?.addEventListener('click', () => {

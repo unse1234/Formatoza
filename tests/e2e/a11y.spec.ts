@@ -11,6 +11,10 @@ const PAGES = [
   '/guides/heic-vs-jpg/',
   '/privacy/',
   '/404/',
+  '/id/heic-ke-jpg/',
+  '/vi/',
+  '/tr/csv-json-donusturme/',
+  '/pt/srt-para-vtt/',
 ];
 
 for (const path of PAGES) {
@@ -71,7 +75,7 @@ test('focus moves to results after converting', async ({ page }) => {
 
 test.describe('dark mode', () => {
   test.use({ colorScheme: 'dark' });
-  for (const path of ['/', '/heic-to-jpg/', '/guides/heic-vs-jpg/']) {
+  for (const path of ['/', '/heic-to-jpg/', '/guides/heic-vs-jpg/', '/tr/heic-jpg-cevirme/']) {
     test(`no axe violations on ${path} (dark)`, async ({ page }) => {
       await page.goto(path);
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();

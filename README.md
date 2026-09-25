@@ -19,15 +19,16 @@ The product requirements are in [`converter-site-kit/`](converter-site-kit/). Co
 5. [Enabling AdSense](#enabling-adsense)
 6. [Architecture](#architecture)
 7. [Adding a converter](#adding-a-converter)
-8. [Testing & quality gates](#testing--quality-gates)
-9. [Implemented tools](#implemented-tools)
-10. [Deferred tools and why](#deferred-tools-and-why)
-11. [Known technical limitations](#known-technical-limitations)
-12. [Performance](#performance)
-13. [SEO checklist](#seo-checklist)
-14. [AdSense pre-submission checklist](#adsense-pre-submission-checklist)
-15. [Quality audit results](#quality-audit-results)
-16. [Third-party licences](#third-party-licences)
+8. [Localized pages (international SEO)](#localized-pages-international-seo)
+9. [Testing & quality gates](#testing--quality-gates)
+10. [Implemented tools](#implemented-tools)
+11. [Deferred tools and why](#deferred-tools-and-why)
+12. [Known technical limitations](#known-technical-limitations)
+13. [Performance](#performance)
+14. [SEO checklist](#seo-checklist)
+15. [AdSense pre-submission checklist](#adsense-pre-submission-checklist)
+16. [Quality audit results](#quality-audit-results)
+17. [Third-party licences](#third-party-licences)
 
 ---
 
@@ -199,6 +200,34 @@ src/
 4. Run `npm run verify` and `npm run e2e`. The catalog tests enforce unique titles, meta and H1s, valid links,
    non-duplicated FAQs and a similarity ceiling between pages. The e2e suite automatically covers the new page
    once you add its fixture expectation in `tests/e2e/converters.spec.ts`.
+
+## Localized pages (international SEO)
+
+FormatOza has English at the root plus localized tool pages under `/{locale}/`: Indonesian (`/id/`, 10 pages),
+Turkish (`/tr/`, 9), Vietnamese (`/vi/`, 7) and a Portuguese test set (`/pt/`, 4), each with a localized hub page.
+The markets were chosen from SERP research documented in [`research/`](research/). Start with
+`research/localization-decisions.md`.
+
+How it fits together:
+
+| Piece | Where |
+| --- | --- |
+| Locales (hreflang, OG locale, native name) | `src/i18n/locales.ts` |
+| Which localized pages exist | `src/data/localized-pages.json` (locale → conversion, localized slug, researched keyword) |
+| Page copy (title, meta, H1, intro, steps, FAQ…) | `src/content/localized/{locale}/{slug}.md` (schema in `content-schema.ts`) |
+| Page chrome (headings, table labels, hub, footer) | `src/i18n/pages.ts` |
+| Converter UI dictionaries | `src/i18n/ui/{en,id,vi,tr,pt}.ts` (English is bundled, a localized page passes only its own) |
+| Registry, hreflang sets | `src/i18n/registry.ts` |
+| Routes | `src/pages/[locale]/index.astro`, `src/pages/[locale]/[slug].astro` |
+
+To add a localized page: add an entry to `localized-pages.json` and write its Markdown file. Settings text is
+translated by English source string in the locale's UI dictionary, and the unit tests list any strings that are
+missing. Routes, hreflang (pages and sitemap), hub links, related links and the footer update automatically. To
+add a language: add it to `locales.ts`, `pages.ts` and `src/i18n/ui/`. To remove a test market, delete its JSON
+entries and Markdown files; the build drops its pages, hreflang and sitemap entries.
+
+Only real, working conversions can be localized: the registry throws for unknown conversions, and the e2e suite
+converts a real fixture on every localized page.
 
 ## Testing & quality gates
 

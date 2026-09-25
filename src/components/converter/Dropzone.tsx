@@ -2,6 +2,7 @@ import { useId, useRef, useState, type DragEvent } from 'react';
 import { formatBytes } from '~/lib/file/format';
 import type { ClientConversion } from '~/lib/catalog/types';
 import { UploadIcon } from './icons';
+import { fmt, useUi } from './i18n';
 
 interface Props {
   conversion: ClientConversion;
@@ -28,6 +29,8 @@ export function Dropzone({
   const [over, setOver] = useState(false);
   const depth = useRef(0);
   const hintId = useId();
+  const t = useUi();
+  const d = t.dropzone;
   const inputId = useId();
   const { input, fromName } = conversion;
   const exts = input.extensions
@@ -90,15 +93,20 @@ export function Dropzone({
       <div className={compact ? 'sm:text-left' : ''}>
         <p className={compact ? 'text-sm font-medium text-fg' : 'text-base font-medium text-fg'}>
           {over
-            ? `Drop to add ${input.multiple ? 'files' : 'the file'}`
-            : compact
-              ? `Add more ${fromName} files`
-              : `Drop ${fromName} ${input.multiple ? 'files' : 'file'} here`}
+            ? input.multiple
+              ? d.dropToAddFiles
+              : d.dropToAddFile
+            : fmt(compact ? d.addMore : input.multiple ? d.dropFiles : d.dropFile, {
+                from: fromName,
+              })}
         </p>
         {!compact && (
           <p id={hintId} className="mt-1 text-[13px] text-fg-3">
-            {exts} · up to {formatBytes(input.maxFileBytes)}{' '}
-            {input.multiple ? `each · ${input.maxFiles} files at a time` : ''}
+            {fmt(input.multiple ? d.hintMulti : d.hintSingle, {
+              exts,
+              size: formatBytes(input.maxFileBytes),
+              n: input.maxFiles,
+            })}
           </p>
         )}
       </div>
@@ -122,11 +130,11 @@ export function Dropzone({
         htmlFor={inputId}
         className={`${compact ? 'btn btn-secondary btn-sm' : 'btn btn-primary'} peer-focus-visible:shadow-[var(--focus-ring)] ${disabled ? 'pointer-events-none opacity-50' : ''}`}
       >
-        {compact ? 'Choose files' : `Choose ${input.multiple ? 'files' : 'file'}`}
+        {compact || input.multiple ? d.chooseFiles : d.chooseFile}
       </label>
       {!compact && (
         <p className="hidden text-xs text-fg-3 sm:block">
-          or paste {conversion.engine === 'image' ? 'an image' : 'a file'} with Ctrl/⌘ + V
+          {conversion.engine === 'image' ? d.pasteImage : d.pasteFile}
         </p>
       )}
     </div>

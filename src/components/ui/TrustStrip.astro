@@ -9,26 +9,39 @@ interface Props {
   processing: BrowserProcessingStatus;
   lazyAssetNote?: string | undefined;
   class?: string;
+  /** Localized copy (defaults to English). */
+  strings?: {
+    deviceTitle: string;
+    deviceText: string;
+    accountTitle: string;
+    accountText: string;
+    fastTitle: string;
+    fastText: string;
+    freeTitle: string;
+    freeText: string;
+  };
 }
-const { processing, lazyAssetNote, class: className } = Astro.props;
+const {
+  processing,
+  lazyAssetNote,
+  class: className,
+  strings: s = {
+    deviceTitle: 'Stays on your device',
+    deviceText: 'Files are processed by your browser and never uploaded.',
+    accountTitle: 'No account',
+    accountText: 'No sign-up, no email, no watermark.',
+    fastTitle: 'Fast',
+    fastText: 'No upload or queue — conversion starts instantly.',
+    freeTitle: 'Free',
+    freeText: 'Every tool is free to use, supported by ads.',
+  },
+} = Astro.props;
 const local = processing === 'local' || processing === 'local-lazy-assets';
 const items = [
-  ...(local
-    ? [
-        {
-          icon: 'shield' as const,
-          title: 'Stays on your device',
-          text: 'Files are processed by your browser and never uploaded.',
-        },
-      ]
-    : []),
-  { icon: 'user-off' as const, title: 'No account', text: 'No sign-up, no email, no watermark.' },
-  {
-    icon: 'bolt' as const,
-    title: 'Fast',
-    text: 'No upload or queue — conversion starts instantly.',
-  },
-  { icon: 'gift' as const, title: 'Free', text: 'Every tool is free to use, supported by ads.' },
+  ...(local ? [{ icon: 'shield' as const, title: s.deviceTitle, text: s.deviceText }] : []),
+  { icon: 'user-off' as const, title: s.accountTitle, text: s.accountText },
+  { icon: 'bolt' as const, title: s.fastTitle, text: s.fastText },
+  { icon: 'gift' as const, title: s.freeTitle, text: s.freeText },
 ];
 ---
 

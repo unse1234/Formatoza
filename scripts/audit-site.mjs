@@ -8,6 +8,13 @@ const DIST = 'dist';
 const conversions = JSON.parse(readFileSync('src/data/conversions.json', 'utf8'));
 const categories = JSON.parse(readFileSync('src/data/categories.json', 'utf8'));
 const guides = readdirSync('src/content/guides').map((f) => f.replace(/\.md$/, ''));
+const localizedPages = Object.entries(
+  JSON.parse(readFileSync('src/data/localized-pages.json', 'utf8')),
+).flatMap(([locale, entries]) =>
+  entries.map((e) => ({ ...e, locale, path: `/${locale}/${e.slug}/` })),
+);
+const locales = [...new Set(localizedPages.map((p) => p.locale))];
+const localeOf = (path) => locales.find((l) => path.startsWith(`/${l}/`)) ?? 'en';
 const SITE = (process.env.PUBLIC_SITE_URL || 'https://formatoza.com').replace(/\/+$/, '');
 
 const failures = [];
@@ -71,11 +78,13 @@ const expected = [
   ...conversions.map((c) => `/${c.slug}/`),
   ...Object.values(categories).map((c) => `/${c.path}/`),
   ...guides.map((g) => `/guides/${g}/`),
+  ...locales.map((l) => `/${l}/`),
+  ...localizedPages.map((p) => p.path),
 ];
 for (const p of expected) if (!byPath.has(p)) fail(`missing page ${p}`);
 for (const p of pages) if (!expected.includes(p.path)) fail(`unexpected page ${p.path}`);
 ok(
-  `${expected.length} expected pages present (${conversions.length} converters), no unexpected routes`,
+  `${expected.length} expected pages present (${conversions.length} converters, ${localizedPages.length} localized tools in ${locales.length} languages), no unexpected routes`,
 );
 
 console.log('\nMetadata');
@@ -91,7 +100,8 @@ for (const p of pages) {
     !/name="twitter:card"/.test(p.html)
   )
     fail(`${p.path}: incomplete Open Graph/Twitter tags`);
-  if (!/<html lang="en"/.test(p.html)) fail(`${p.path}: missing lang`);
+  if (!p.html.includes(`<html lang="${localeOf(p.path)}"`))
+    fail(`${p.path}: <html lang> should be "${localeOf(p.path)}"`);
 }
 for (const p of indexable) {
   if (p.canonical !== `${SITE}${p.path}`) fail(`${p.path}: canonical ${p.canonical}`);
@@ -108,6 +118,7 @@ for (const key of ['title', 'description', 'h1']) {
   }
 }
 ok('every page: title, meta description, canonical, robots, OG/Twitter, lang, exactly one H1');
+ok('<html lang> matches the URL language on every page');
 ok('titles, meta descriptions and H1s are unique across all indexable pages');
 
 console.log('\nStructured data');
@@ -130,6 +141,11 @@ for (const c of conversions) {
   const t = byPath.get(`/${c.slug}/`)?.ldTypes ?? [];
   for (const need of ['BreadcrumbList', 'WebApplication', 'FAQPage', 'Organization'])
     if (!t.includes(need)) fail(`/${c.slug}/: JSON-LD lacks ${need}`);
+}
+for (const lp of localizedPages) {
+  const t = byPath.get(lp.path)?.ldTypes ?? [];
+  for (const need of ['BreadcrumbList', 'WebApplication', 'FAQPage'])
+    if (!t.includes(need)) fail(`${lp.path}: JSON-LD lacks ${need}`);
 }
 for (const g of guides)
   if (!(byPath.get(`/guides/${g}/`)?.ldTypes ?? []).includes('Article'))
@@ -160,6 +176,93 @@ for (const c of conversions) {
 }
 ok(
   'each tool page ships its H1, intro, steps, format facts, limits, FAQ, related links and converter markup in static HTML',
+);
+
+console.log('\nLocalized pages');
+// Converter strings that must not appear in a localized page's static HTML (the island is
+// server-rendered in the page language) and a sentinel per language to prove each page ships
+// only its own dictionary.
+const ENGLISH_UI = ['Choose files', 'Runs in your browser', 'Frequently asked questions', 'Drop '];
+const SENTINEL = {
+  id: 'Mengonversi…',
+  vi: 'Đang chuyển đổi…',
+  tr: 'Dönüştürülüyor…',
+  pt: 'Convertendo…',
+};
+for (const lp of localizedPages) {
+  const p = byPath.get(lp.path);
+  if (!p) continue;
+  const text = p.html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+  const words = text.split(/\s+/).filter(Boolean).length;
+  if (words < 600) fail(`${lp.path}: only ${words} words of static HTML`);
+  for (const id of ['about', 'how-to', 'formats', 'limits', 'limitations', 'use-cases', 'faq'])
+    if (!p.html.includes(`id="${id}"`)) fail(`${lp.path}: missing section #${id}`);
+  if (!p.html.includes('data-testid="dropzone"')) fail(`${lp.path}: converter not server-rendered`);
+  for (const en of ENGLISH_UI)
+    if (text.includes(en)) fail(`${lp.path}: English UI text "${en}" in static HTML`);
+  for (const [l, s] of Object.entries(SENTINEL))
+    if ((l === lp.locale) !== p.html.includes(s))
+      fail(`${lp.path}: ${l === lp.locale ? 'missing its' : 'ships the'} ${l} dictionary`);
+  if (!p.html.includes(`href="/${lp.locale}/"`)) fail(`${lp.path}: no link to its hub`);
+  if (!p.html.includes(`href="/${lp.conversion}/"`))
+    fail(`${lp.path}: no link to the English page`);
+  const words2 = lp.keyword.toLowerCase();
+  if (!`${p.title} ${p.h1}`.toLowerCase().includes(words2))
+    fail(`${lp.path}: researched keyword "${lp.keyword}" not in title or H1`);
+}
+for (const l of locales) {
+  const hub = byPath.get(`/${l}/`);
+  for (const lp of localizedPages.filter((x) => x.locale === l))
+    if (!hub?.html.includes(`href="${lp.path}"`)) fail(`/${l}/: hub does not link ${lp.path}`);
+}
+ok(
+  'localized tool pages: page-language UI in static HTML, own dictionary only, full content sections, researched keyword in title/H1, links to hub and English page',
+);
+
+console.log('\nhreflang');
+const alternatesOf = (p) =>
+  [...p.html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((m) => ({
+    lang: m[1],
+    href: m[2],
+  }));
+let clusters = 0;
+for (const p of indexable) {
+  const alts = alternatesOf(p);
+  if (!alts.length) continue;
+  clusters++;
+  const self = `${SITE}${p.path}`;
+  if (!alts.some((a) => a.href === self && a.lang === localeOf(p.path)))
+    fail(`${p.path}: hreflang set lacks a self-reference`);
+  const xd = alts.filter((a) => a.lang === 'x-default');
+  if (xd.length !== 1 || localeOf(xd[0].href.replace(SITE, '')) !== 'en')
+    fail(`${p.path}: needs exactly one x-default pointing to English`);
+  const langs = alts.map((a) => a.lang);
+  if (new Set(langs).size !== langs.length) fail(`${p.path}: duplicate hreflang values`);
+  for (const a of alts) {
+    const target = byPath.get(a.href.replace(SITE, ''));
+    if (!target) {
+      fail(`${p.path}: hreflang ${a.lang} points to missing ${a.href}`);
+      continue;
+    }
+    if (a.lang !== 'x-default' && localeOf(target.path) !== a.lang)
+      fail(`${p.path}: hreflang ${a.lang} points to a ${localeOf(target.path)} page`);
+    if (target.canonical !== a.href) fail(`${p.path}: hreflang target ${a.href} is not canonical`);
+    const back = alternatesOf(target);
+    const key = (xs) =>
+      xs
+        .map((x) => `${x.lang} ${x.href}`)
+        .sort()
+        .join('|');
+    if (key(back) !== key(alts)) fail(`${p.path}: hreflang not reciprocal with ${a.href}`);
+  }
+}
+for (const c of conversions) {
+  const has = localizedPages.some((x) => x.conversion === c.slug);
+  const p = byPath.get(`/${c.slug}/`);
+  if (p && !has && alternatesOf(p).length) fail(`/${c.slug}/: hreflang on an English-only page`);
+}
+ok(
+  `${clusters} pages carry hreflang: self-referencing, reciprocal, existing targets, one English x-default; English-only pages carry none`,
 );
 
 console.log('\nInternal links');
@@ -199,6 +302,22 @@ for (const u of urls) if (!want.has(u)) fail(`sitemap contains unexpected URL ${
 for (const u of want) if (!urls.includes(u)) fail(`sitemap misses ${u}`);
 if (new Set(urls).size !== urls.length) fail('sitemap has duplicates');
 ok(`sitemap lists exactly the ${want.size} canonical indexable pages (404 excluded)`);
+const sitemapXml = sitemapFiles.map((f) => readFileSync(join(DIST, f), 'utf8')).join('');
+for (const m of sitemapXml.matchAll(/<url><loc>([^<]+)<\/loc>([\s\S]*?)<\/url>/g)) {
+  const links = [...m[2].matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)]
+    .map((x) => `${x[1]} ${x[2]}`)
+    .sort()
+    .join('|');
+  const page = byPath.get(m[1].replace(SITE, ''));
+  const tags = page
+    ? alternatesOf(page)
+        .map((a) => `${a.lang} ${a.href}`)
+        .sort()
+        .join('|')
+    : '';
+  if (links !== tags) fail(`sitemap hreflang for ${m[1]} differs from the page's tags`);
+}
+ok('sitemap hreflang annotations match each page’s <link rel="alternate"> tags');
 const robots = readFileSync(join(DIST, 'robots.txt'), 'utf8');
 if (
   !/User-agent: \*\nAllow: \//.test(robots) ||
@@ -243,6 +362,12 @@ function staticGraph(entry, seen = new Set()) {
 const tool = byPath.get('/heic-to-jpg/');
 const graph = new Set();
 for (const s of scriptSrcs(tool.html)) staticGraph(s, graph);
+const localizedTool = localizedPages[0] && byPath.get(localizedPages[0].path);
+if (
+  localizedTool &&
+  scriptSrcs(localizedTool.html).sort().join() !== scriptSrcs(tool.html).sort().join()
+)
+  fail(`${localizedTool.path}: loads different scripts than the English tool page`);
 const toolJs = [...graph].reduce((n, f) => n + gz(join(DIST, f)), 0);
 const heavy = [...graph].filter((f) =>
   /\/(pdf|heic|mammoth|papaparse|yaml|xml|UTIF|webp_enc|marked|turndown|fflate|core|render|es)[.-]/i.test(

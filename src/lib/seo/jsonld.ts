@@ -51,13 +51,22 @@ export function breadcrumbList(crumbs: Crumb[]): Json {
   };
 }
 
-export function webApplication(c: ConversionMeta): Json {
+/** Overrides for a localized page exposing the same tool. */
+export interface AppOverrides {
+  path?: string;
+  name?: string;
+  description?: string;
+  inLanguage?: string;
+}
+
+export function webApplication(c: ConversionMeta, o: AppOverrides = {}): Json {
+  const url = absoluteUrl(o.path ?? c.path);
   return {
     '@type': 'WebApplication',
-    '@id': `${absoluteUrl(c.path)}#app`,
-    name: `${c.h1} — ${SITE.name}`,
-    url: absoluteUrl(c.path),
-    description: c.shortDescription,
+    '@id': `${url}#app`,
+    name: o.name ?? `${c.h1} — ${SITE.name}`,
+    url,
+    description: o.description ?? c.shortDescription,
     applicationCategory:
       c.category === 'developer' || c.category === 'data'
         ? 'DeveloperApplication'
@@ -68,14 +77,15 @@ export function webApplication(c: ConversionMeta): Json {
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: { '@id': ORG_ID },
-    inLanguage: SITE.lang,
+    inLanguage: o.inLanguage ?? SITE.lang,
   };
 }
 
-export function faqPage(faq: FaqItem[], path: string): Json {
+export function faqPage(faq: FaqItem[], path: string, inLanguage?: string): Json {
   return {
     '@type': 'FAQPage',
     '@id': `${absoluteUrl(path)}#faq`,
+    ...(inLanguage ? { inLanguage } : {}),
     mainEntity: faq.map((f) => ({
       '@type': 'Question',
       name: f.q,
