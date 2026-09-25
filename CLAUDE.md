@@ -35,6 +35,14 @@ npm run fixtures     # regenerate test fixtures in tests/fixtures/input
 8. **Ads** only via `<AdSlot>` outside the converter island, only on tool and guide pages, and only
    when `PUBLIC_ADSENSE_CLIENT` is configured. Never near download buttons.
 
+9. **Localization is data-driven and only for working tools.** Localized pages are listed in
+   `src/data/localized-pages.json` and written in `src/content/localized/{locale}/{slug}.md`. One template
+   (`src/pages/[locale]/[slug].astro`) renders them all. Never add a localized page for a conversion that doesn't
+   exist, and never machine-copy English prose. The island ships only the page's own UI dictionary
+   (`uiStringsFor`). Engines stay English: the UI localizes by error code and marks English engine details
+   `lang="en"`. hreflang is generated only between pages that exist (`src/i18n/registry.ts`), and the site audit
+   checks reciprocity and that the sitemap matches. Market choices and their evidence are in `research/`.
+
 ## Design
 
 Implements `converter-site-kit/DESIGN.md`: tokens in `src/styles/global.css` (achromatic palette,

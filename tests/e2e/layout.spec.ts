@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { CONVERSIONS, watchConsole } from './helpers';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { CONVERSIONS, ROOT, watchConsole } from './helpers';
+
+const LOCALIZED = Object.entries(
+  JSON.parse(readFileSync(join(ROOT, 'src/data/localized-pages.json'), 'utf8')) as Record<
+    string,
+    { slug: string }[]
+  >,
+).flatMap(([locale, entries]) => [`/${locale}/`, ...entries.map((e) => `/${locale}/${e.slug}/`)]);
 
 const PAGES = [
   '/',
@@ -19,6 +28,7 @@ const PAGES = [
   '/how-it-works/',
   '/editorial-policy/',
   ...CONVERSIONS.map((c) => `/${c.slug}/`),
+  ...LOCALIZED,
 ];
 
 for (const path of PAGES) {

@@ -9,20 +9,18 @@ import AdSlotPlaceholder from './AdSlotPlaceholder.astro';
 interface Props {
   placement: AdPlacement;
   class?: string;
+  /** "Advertisement" in the page language. */
+  label?: string;
 }
-const { placement, class: className } = Astro.props;
+const { placement, class: className, label = 'Advertisement' } = Astro.props;
 const slot = ADS.slotFor(placement);
 const show = Boolean(slot) || ADS.placeholders;
 ---
 
 {show && (
-  <aside
-    class:list={['fz-ad my-10', className]}
-    aria-label="Advertisement"
-    data-ad-placement={placement}
-  >
+  <aside class:list={['fz-ad my-10', className]} aria-label={label} data-ad-placement={placement}>
     <p class="mb-2 text-center text-[11px] font-medium tracking-wide text-fg-3 uppercase">
-      Advertisement
+      {label}
     </p>
     {slot ? (
       <div class="min-h-[250px] overflow-hidden rounded-lg">

@@ -9,6 +9,8 @@ import { SITE } from '~/config/site';
 import { ADS } from '~/config/ads';
 import { consentDefaultsScript } from '~/lib/consent/consent';
 import type { PageMeta } from '~/lib/seo/meta';
+import { LOCALES } from '~/i18n/locales';
+import { PAGE_STRINGS } from '~/i18n/pages';
 
 interface Props {
   meta: PageMeta;
@@ -20,6 +22,9 @@ interface Props {
 }
 const { meta, jsonLd, ads = false, hideHeaderSearch = false } = Astro.props;
 const loadAds = ads && ADS.enabled;
+const locale = meta.locale ?? 'en';
+const lang = LOCALES[locale].hreflang;
+const skipLabel = locale === 'en' ? 'Skip to content' : PAGE_STRINGS[locale].skipToContent;
 // Loads AdSense after the page is idle (or on first interaction) so it never
 // competes with the converter for bandwidth or main-thread time.
 const adLoader = `(function(){var c=${JSON.stringify(ADS.client)};var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+encodeURIComponent(c);document.head.appendChild(s);window.adsbygoogle=window.adsbygoogle||[];document.querySelectorAll('ins.adsbygoogle').forEach(function(){try{window.adsbygoogle.push({});}catch(e){}});}function later(){if('requestIdleCallback' in window){requestIdleCallback(load,{timeout:3000});}else{setTimeout(load,1500);}}if(document.readyState==='complete'){later();}else{addEventListener('load',later,{once:true});}['pointerdown','keydown','scroll'].forEach(function(e){addEventListener(e,load,{once:true,passive:true});});})();`;
@@ -27,7 +32,7 @@ const cfBeacon = (import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '').trim();
 ---
 
 <!doctype html>
-<html lang={SITE.lang} dir="ltr">
+<html lang={lang} dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -63,12 +68,12 @@ const cfBeacon = (import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '').trim();
   </head>
   <body class="flex min-h-dvh flex-col">
     <a href="#main" class="sr-only-focusable fixed top-2 left-2 z-[100] btn btn-primary btn-sm">
-      Skip to content
+      {skipLabel}
     </a>
-    <Header hideSearch={hideHeaderSearch} />
+    <Header hideSearch={hideHeaderSearch} locale={locale} alternates={meta.alternates ?? []} />
     <main id="main" class="flex-1" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    <Footer locale={locale} />
   </body>
 </html>

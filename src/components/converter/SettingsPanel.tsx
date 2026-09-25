@@ -1,6 +1,8 @@
 import { useId, useState } from 'react';
 import { isFieldVisible, type OptionField, type OptionValues } from '~/engines/options';
 import { ChevronIcon, SettingsIcon } from './icons';
+import { useUi } from './i18n';
+import type { UiStrings } from '~/i18n/ui/types';
 
 interface Props {
   fields: OptionField[];
@@ -10,26 +12,27 @@ interface Props {
   defaultOpen?: boolean;
 }
 
-function summary(fields: OptionField[], values: OptionValues): string {
+function summary(fields: OptionField[], values: OptionValues, t: UiStrings): string {
   const parts: string[] = [];
   for (const f of fields) {
     if (!isFieldVisible(f, values) || values[f.key] === f.default) continue;
     const v = values[f.key];
     if (f.type === 'select') parts.push(f.choices.find((c) => c.value === v)?.label ?? String(v));
-    else if (f.type === 'boolean') parts.push(`${f.label}: ${v ? 'on' : 'off'}`);
+    else if (f.type === 'boolean') parts.push(`${f.label}: ${v ? t.settings.on : t.settings.off}`);
     else if (f.type === 'range' || f.type === 'number')
       parts.push(`${f.label} ${v}${f.unit ?? ''}`);
     else parts.push(`${f.label}: ${String(v) || '—'}`);
   }
   return parts.length
     ? parts.slice(0, 3).join(' · ') + (parts.length > 3 ? ' …' : '')
-    : 'Default settings';
+    : t.settings.defaults;
 }
 
 export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen = false }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const panelId = useId();
   const baseId = useId();
+  const t = useUi();
   if (!fields.length) return null;
   const visible = fields.filter((f) => isFieldVisible(f, values));
 
@@ -43,9 +46,9 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
         onClick={() => setOpen((o) => !o)}
       >
         <SettingsIcon className="shrink-0 text-fg-2" />
-        <span className="text-sm font-medium text-fg">Settings</span>
+        <span className="text-sm font-medium text-fg">{t.settings.title}</span>
         <span className="min-w-0 flex-1 truncate text-[13px] text-fg-3">
-          {summary(fields, values)}
+          {summary(fields, values, t)}
         </span>
         <ChevronIcon
           className={`shrink-0 text-fg-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
@@ -53,7 +56,7 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
       </button>
       <div id={panelId} hidden={!open} className="px-4 pt-1 pb-4">
         <fieldset disabled={disabled} className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
-          <legend className="sr-only">Conversion settings</legend>
+          <legend className="sr-only">{t.settings.legend}</legend>
           {visible.map((f) => {
             const id = `${baseId}-${f.key}`;
             const helpId = f.help ? `${id}-help` : undefined;
@@ -175,7 +178,7 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
                         className="size-6 rounded-full shadow-border"
                         style={{ background: c }}
                         onClick={() => onChange(f.key, c)}
-                        aria-label={`Use ${c === '#ffffff' ? 'white' : 'black'}`}
+                        aria-label={c === '#ffffff' ? t.settings.useWhite : t.settings.useBlack}
                       />
                     ))}
                   </div>

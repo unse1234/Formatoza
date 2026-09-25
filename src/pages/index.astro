@@ -13,6 +13,7 @@ import { CONVERSIONS } from '~/lib/catalog/registry';
 import { graph, organization, website } from '~/lib/seo/jsonld';
 import { getCollection } from 'astro:content';
 import { SITE } from '~/config/site';
+import { homeAlternates } from '~/i18n/registry';
 
 const popular = [
   'heic-to-jpg',
@@ -53,6 +54,7 @@ const faq = [
     description: SITE.description,
     path: '/',
     brandSuffix: false,
+    alternates: homeAlternates(),
   }}
   jsonLd={graph(organization(), website())}
   hideHeaderSearch

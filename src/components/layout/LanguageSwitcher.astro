@@ -1,0 +1,77 @@
+---
+/**
+ * Links to this page in other languages (only pages that exist). A native <details>
+ * disclosure: works without JavaScript, is keyboard operable and announces its state.
+ */
+import Icon from '~/components/ui/Icon.astro';
+import { LOCALES, type LocaleCode } from '~/i18n/locales';
+import type { Alternate } from '~/i18n/registry';
+
+interface Props {
+  current: LocaleCode;
+  alternates: Alternate[];
+  /** "Language" in the page language. */
+  label: string;
+}
+const { current, alternates, label } = Astro.props;
+const links = alternates.filter(
+  (a): a is Alternate & { locale: LocaleCode } => a.locale !== 'x-default',
+);
+const currentName = LOCALES[current].nativeName;
+---
+
+{links.length > 1 && (
+  <details class="group relative" data-lang-menu>
+    <summary
+      class="btn btn-ghost btn-sm list-none gap-1.5 [&::-webkit-details-marker]:hidden"
+      aria-label={`${label}: ${currentName}`}
+    >
+      <Icon name="globe" size={16} />
+      <span class="font-mono text-xs font-medium uppercase" aria-hidden="true">
+        {current}
+      </span>
+      <Icon
+        name="chevron-down"
+        size={14}
+        class="text-fg-3 transition-transform group-open:rotate-180"
+      />
+    </summary>
+    <div class="animate-enter absolute right-0 z-50 mt-2 w-56 rounded-lg bg-surface p-1.5 shadow-menu">
+      <p class="px-2.5 pt-1.5 pb-1 text-[12px] font-medium text-fg-3">{label}</p>
+      <ul class="grid gap-0.5">
+        {links.map((a) => (
+          <li>
+            <a
+              href={a.href}
+              hreflang={a.hreflang}
+              lang={a.hreflang}
+              aria-current={a.locale === current ? 'page' : undefined}
+              class:list={[
+                'flex items-center justify-between rounded-md px-2.5 py-2 text-sm hover:bg-hover',
+                a.locale === current ? 'font-medium text-fg' : 'text-fg-2',
+              ]}
+            >
+              {LOCALES[a.locale].nativeName}
+              {a.locale === current && <span class="dot bg-dot-green" aria-hidden="true" />}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </details>
+)}
+
+<script>
+  // Escape closes the language menu and returns focus to its toggle; clicking outside closes it.
+  for (const menu of document.querySelectorAll<HTMLDetailsElement>('[data-lang-menu]')) {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
+    });
+  }
+</script>

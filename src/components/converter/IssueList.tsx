@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import type { ConversionIssue } from '~/engines/types';
+import { IssueBody } from './IssueBody';
+import { describeIssue, fmt, useUi } from './i18n';
 
 interface Props {
   issues: ConversionIssue[];
   tone: 'error' | 'warning' | 'info';
   collapseAfter?: number;
+  vars: { from: string; limit: string; max: number };
 }
 
 const DOT = { error: 'bg-dot-red', warning: 'bg-dot-amber', info: 'bg-dot-blue' } as const;
 
-export function IssueList({ issues, tone, collapseAfter = 4 }: Props) {
+export function IssueList({ issues, tone, collapseAfter = 4, vars }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const t = useUi();
   if (!issues.length) return null;
   const unique = issues.filter(
     (x, i, all) => all.findIndex((y) => y.message === x.message && y.file === x.file) === i,
@@ -24,10 +28,10 @@ export function IssueList({ issues, tone, collapseAfter = 4 }: Props) {
             <span className={`dot mt-1.5 ${DOT[tone]}`} aria-hidden="true" />
             <span className="min-w-0">
               <span className="sr-only">
-                {tone === 'error' ? 'Error: ' : tone === 'warning' ? 'Note: ' : ''}
+                {tone === 'error' ? t.issues.error : tone === 'warning' ? t.issues.note : ''}
               </span>
               {x.file && <span className="font-medium break-all text-fg">{x.file}: </span>}
-              {x.message}
+              <IssueBody issue={describeIssue(x, t, vars)} />
             </span>
           </li>
         ))}
@@ -38,7 +42,9 @@ export function IssueList({ issues, tone, collapseAfter = 4 }: Props) {
           className="mt-2 text-[13px] text-accent hover:underline"
           onClick={() => setExpanded((e) => !e)}
         >
-          {expanded ? 'Show fewer' : `Show ${unique.length - collapseAfter} more`}
+          {expanded
+            ? t.issues.showFewer
+            : fmt(t.issues.showMore, { n: unique.length - collapseAfter })}
         </button>
       )}
     </div>

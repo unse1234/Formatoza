@@ -22,6 +22,9 @@ import {
 import { OUTPUT_TYPE, FORMAT_EXTENSIONS } from '~/engines/shared/extensions';
 import { bucketDuration, bucketFiles, bucketSize, track } from '~/lib/analytics';
 import { checkCapabilities, type Capability } from '~/lib/file/capabilities';
+import type { UiStrings } from '~/i18n/ui/types';
+import { en } from '~/i18n/ui/en';
+import { fmt, localizeFields } from './i18n';
 
 export type Phase = 'idle' | 'ready' | 'converting' | 'done';
 export type InputMode = 'file' | 'paste';
@@ -60,7 +63,7 @@ type Action =
   | { type: 'progress'; progress: ProgressUpdate }
   | { type: 'done'; result: ConversionResult; options: string }
   | { type: 'fatal'; issue: ConversionIssue }
-  | { type: 'cancelled' }
+  | { type: 'cancelled'; notice: string }
   | { type: 'capability'; capability: Capability }
   | { type: 'engine'; status: State['engine'] }
   | { type: 'dismissNotice' };
@@ -164,7 +167,7 @@ function reducer(s: State, a: Action): State {
         ...s,
         phase: phaseFor(s.items, s.text, s.mode),
         progress: null,
-        notice: 'Conversion cancelled. Nothing was saved.',
+        notice: a.notice,
       };
     case 'capability':
       return { ...s, capability: a.capability };
@@ -180,10 +183,10 @@ const uid = () => `f${Date.now().toString(36)}${(counter++).toString(36)}`;
 
 const AUTO_CONVERT_MAX_CHARS = 200_000;
 
-export function useConverter(conversion: ClientConversion) {
+export function useConverter(conversion: ClientConversion, t: UiStrings = en) {
   const fields: OptionField[] = useMemo(
-    () => getOptionFields(conversion.engine, conversion.from, conversion.to),
-    [conversion],
+    () => localizeFields(getOptionFields(conversion.engine, conversion.from, conversion.to), t),
+    [conversion, t],
   );
   const [state, dispatch] = useReducer(reducer, undefined, (): State => ({
     phase: 'idle',
@@ -228,12 +231,11 @@ export function useConverter(conversion: ClientConversion) {
       return e;
     } catch {
       dispatch({ type: 'engine', status: 'error' });
-      throw new ConversionError(
-        'INTERNAL',
-        'The converter could not be loaded. Check your connection and try again.',
-      );
+      throw Object.assign(new ConversionError('INTERNAL', t.notices.engineLoadFailed), {
+        localized: true,
+      });
     }
-  }, [conversion.engine]);
+  }, [conversion.engine, t]);
 
   const preload = useCallback(() => {
     void ensureEngine().catch(() => undefined);
@@ -261,9 +263,12 @@ export function useConverter(conversion: ClientConversion) {
       let notice: string | null = null;
       if (fresh.length > accepted.length)
         notice = conversion.input.multiple
-          ? `Only ${conversion.input.maxFiles} files can be converted at once; ${fresh.length - accepted.length} were not added.`
-          : 'This tool converts one file at a time; only the first file was added.';
-      else if (fresh.length < incoming.length) notice = 'Duplicate files were skipped.';
+          ? fmt(t.notices.maxFiles, {
+              max: conversion.input.maxFiles,
+              n: fresh.length - accepted.length,
+            })
+          : t.notices.oneFile;
+      else if (fresh.length < incoming.length) notice = t.notices.duplicates;
       const items: Item[] = accepted.map((file) => {
         const v = validateFiles(
           { files: [file], from: conversion.from, to: conversion.to },
@@ -274,7 +279,7 @@ export function useConverter(conversion: ClientConversion) {
       dispatch({ type: 'add', items, notice, replace });
       preload();
     },
-    [conversion, limits, preload],
+    [conversion, limits, preload, t],
   );
 
   const inputFiles = useCallback((): File[] => {
@@ -295,8 +300,8 @@ export function useConverter(conversion: ClientConversion) {
         type: 'fatal',
         issue: {
           code: 'EMPTY_INPUT',
-          message:
-            s.mode === 'paste' ? 'Paste some text first.' : 'Add at least one valid file first.',
+          message: s.mode === 'paste' ? t.notices.pasteFirst : t.notices.addValidFile,
+          localized: true,
         },
       });
       return;
@@ -352,15 +357,22 @@ export function useConverter(conversion: ClientConversion) {
             );
       if (e.code === 'ABORTED') {
         track('convert_cancel', { ...baseProps, outcome: 'cancelled' });
-        dispatch({ type: 'cancelled' });
+        dispatch({ type: 'cancelled', notice: t.notices.cancelled });
       } else {
         track('convert_complete', { ...baseProps, outcome: 'error', errorCode: e.code });
-        dispatch({ type: 'fatal', issue: { code: e.code, message: e.message } });
+        dispatch({
+          type: 'fatal',
+          issue: {
+            code: e.code,
+            message: e.message,
+            ...((e as { localized?: boolean }).localized ? { localized: true } : {}),
+          },
+        });
       }
     } finally {
       if (abortRef.current === controller) abortRef.current = null;
     }
-  }, [conversion, ensureEngine, inputFiles, limits]);
+  }, [conversion, ensureEngine, inputFiles, limits, t]);
 
   const cancel = useCallback(() => abortRef.current?.abort(), []);
 

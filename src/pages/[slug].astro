@@ -2,6 +2,7 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Breadcrumbs from '~/components/layout/Breadcrumbs.astro';
 import ConverterShell from '~/components/converter/ConverterShell.tsx';
+import PendingFilesScript from '~/components/converter/PendingFilesScript.astro';
 import TrustStrip from '~/components/ui/TrustStrip.astro';
 import FormatCompare from '~/components/ui/FormatCompare.astro';
 import RelatedTools from '~/components/ui/RelatedTools.astro';
@@ -21,6 +22,7 @@ import {
 import { formatBytes } from '~/lib/file/format';
 import { getEntry } from 'astro:content';
 import { SITE } from '~/config/site';
+import { conversionAlternates } from '~/i18n/registry';
 
 export function getStaticPaths() {
   return CONVERSIONS.map((c) => ({ params: { slug: c.slug } }));
@@ -65,7 +67,12 @@ const introParas = c.intro.split(/\n\s*\n/);
 ---
 
 <BaseLayout
-  meta={{ title: c.title, description: c.metaDescription, path: c.path }}
+  meta={{
+    title: c.title,
+    description: c.metaDescription,
+    path: c.path,
+    alternates: conversionAlternates(c.slug),
+  }}
   jsonLd={jsonLd}
   ads
 >
@@ -85,37 +92,7 @@ const introParas = c.intro.split(/\n\s*\n/);
 
     <div class="mt-8">
       <ConverterShell client:load conversion={toClientConversion(c)} />
-      <script is:inline>
-        // Before the converter hydrates: a dropped file must never navigate away, and files the
-        // visitor already picked or dropped are queued for the converter to adopt on mount.
-        // After hydration, drops outside the drop zone are ignored instead of opening the file.
-        (() => {
-          const w = window;
-          w.__fzPending = [];
-          const hasFiles = (e) =>
-            Boolean(e.dataTransfer) && [...(e.dataTransfer.types || [])].includes('Files');
-          const inZone = (e) => Boolean(e.target?.closest?.('[data-testid="dropzone"]'));
-          addEventListener('dragover', (e) => {
-            if (!hasFiles(e)) return;
-            e.preventDefault();
-            if (w.__fzReady && !inZone(e)) e.dataTransfer.dropEffect = 'none';
-          });
-          addEventListener('drop', (e) => {
-            if (!hasFiles(e)) return;
-            e.preventDefault();
-            if (!w.__fzReady) w.__fzPending.push(...e.dataTransfer.files);
-          });
-          document.addEventListener(
-            'change',
-            (e) => {
-              const t = e.target;
-              if (!w.__fzReady && t?.type === 'file' && t.files?.length)
-                w.__fzPending.push(...t.files);
-            },
-            true,
-          );
-        })();
-      </script>
+      <PendingFilesScript />
       <noscript>
         <p class="mt-4 rounded-lg bg-surface p-4 text-sm text-fg-2 shadow-border">
           This converter runs in your browser and needs JavaScript. Please enable JavaScript to

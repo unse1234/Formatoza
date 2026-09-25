@@ -1,0 +1,34 @@
+---
+/** Pre-hydration file handling for converter pages (see ConverterShell's mount effect). */
+---
+
+<script is:inline>
+  // Before the converter hydrates: a dropped file must never navigate away, and files the
+  // visitor already picked or dropped are queued for the converter to adopt on mount.
+  // After hydration, drops outside the drop zone are ignored instead of opening the file.
+  (() => {
+    const w = window;
+    w.__fzPending = [];
+    const hasFiles = (e) =>
+      Boolean(e.dataTransfer) && [...(e.dataTransfer.types || [])].includes('Files');
+    const inZone = (e) => Boolean(e.target?.closest?.('[data-testid="dropzone"]'));
+    addEventListener('dragover', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      if (w.__fzReady && !inZone(e)) e.dataTransfer.dropEffect = 'none';
+    });
+    addEventListener('drop', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      if (!w.__fzReady) w.__fzPending.push(...e.dataTransfer.files);
+    });
+    document.addEventListener(
+      'change',
+      (e) => {
+        const t = e.target;
+        if (!w.__fzReady && t?.type === 'file' && t.files?.length) w.__fzPending.push(...t.files);
+      },
+      true,
+    );
+  })();
+</script>

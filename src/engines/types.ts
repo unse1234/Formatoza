@@ -22,6 +22,8 @@ export interface ConversionIssue {
   message: string;
   /** Display name of the file concerned (never sent anywhere). */
   file?: string;
+  /** The message is already in the page language (created by the UI, not an engine). */
+  localized?: boolean;
 }
 
 export interface ValidationResult {

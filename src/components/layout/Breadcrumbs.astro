@@ -2,11 +2,12 @@
 import type { Crumb } from '~/lib/seo/jsonld';
 interface Props {
   items: Crumb[];
+  label?: string;
 }
-const { items } = Astro.props;
+const { items, label = 'Breadcrumb' } = Astro.props;
 ---
 
-<nav aria-label="Breadcrumb" class="text-[13px]">
+<nav aria-label={label} class="text-[13px]">
   <ol class="flex flex-wrap items-center gap-1.5 text-fg-3">
     {items.map((c, i) => (
       <li class="flex items-center gap-1.5">

@@ -4,6 +4,7 @@ import type { OutputSpec } from '~/lib/catalog/types';
 import { formatBytes } from '~/lib/file/format';
 import { track } from '~/lib/analytics';
 import { CheckIcon, CopyIcon, DownloadIcon, ExternalIcon } from './icons';
+import { fmt, localizeDetail, useUi } from './i18n';
 
 const TEXT_PREVIEW_LIMIT = 150_000;
 
@@ -25,6 +26,8 @@ function kindOf(o: OutputFile, fallback: OutputSpec['preview']): OutputSpec['pre
 }
 
 export function ResultCard({ output, preview, tool, expanded = false }: Props) {
+  const t = useUi();
+  const r = t.result;
   const url = useMemo(() => URL.createObjectURL(output.blob), [output.blob]);
   useEffect(() => () => URL.revokeObjectURL(url), [url]);
   const kind = kindOf(output, preview);
@@ -65,7 +68,7 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
     }
   };
 
-  const details = Object.entries(output.details ?? {});
+  const details = Object.entries(output.details ?? {}).map(([k, v]) => localizeDetail(k, v, t));
   const truncated = text !== null && text.length > TEXT_PREVIEW_LIMIT;
 
   return (
@@ -77,7 +80,7 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
         <div className="checker flex max-h-80 min-h-32 items-center justify-center overflow-hidden p-3 shadow-[0_1px_0_0_var(--border)]">
           <img
             src={url}
-            alt={`Converted: ${output.name}`}
+            alt={fmt(r.convertedAlt, { name: output.name })}
             className="max-h-72 max-w-full object-contain"
             decoding="async"
           />
@@ -86,7 +89,7 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
       {(kind === 'text' || kind === 'html') && (
         <div className="relative shadow-[0_1px_0_0_var(--border)]">
           {kind === 'html' && (
-            <div className="flex gap-1 px-3 pt-2" role="tablist" aria-label="Preview mode">
+            <div className="flex gap-1 px-3 pt-2" role="tablist" aria-label={r.previewMode}>
               {(['code', 'rendered'] as const).map((v) => (
                 <button
                   key={v}
@@ -96,14 +99,14 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
                   className={`btn btn-sm ${view === v ? 'bg-hover text-fg' : 'btn-ghost'}`}
                   onClick={() => setView(v)}
                 >
-                  {v === 'code' ? 'HTML' : 'Preview'}
+                  {v === 'code' ? r.code : r.preview}
                 </button>
               ))}
             </div>
           )}
           {view === 'rendered' && kind === 'html' ? (
             <iframe
-              title={`Preview of ${output.name}`}
+              title={fmt(r.previewOf, { name: output.name })}
               sandbox=""
               srcDoc={rendered ?? ''}
               className={`w-full bg-white ${expanded ? 'h-[28rem]' : 'h-64'}`}
@@ -113,14 +116,14 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
             <pre
               className={`overflow-auto p-4 font-mono text-[12.5px] leading-relaxed whitespace-pre-wrap text-fg scrollbar-thin [overflow-wrap:anywhere] ${expanded ? 'max-h-[28rem] min-h-40' : 'max-h-56'}`}
               tabIndex={0}
-              aria-label={`Contents of ${output.name}`}
+              aria-label={fmt(r.contentsOf, { name: output.name })}
               data-testid="result-text"
             >
               {text === null
-                ? 'Loading preview…'
+                ? r.loading
                 : truncated
-                  ? `${text.slice(0, TEXT_PREVIEW_LIMIT)}\n\n… preview truncated — download or copy for the full result.`
-                  : text || '(empty)'}
+                  ? `${text.slice(0, TEXT_PREVIEW_LIMIT)}\n\n${r.truncated}`
+                  : text || r.empty}
             </pre>
           )}
         </div>
@@ -149,13 +152,13 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
               aria-live="polite"
             >
               {copied ? <CheckIcon /> : <CopyIcon />}
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? r.copied : r.copy}
             </button>
           )}
           {kind === 'pdf' && (
             <a className="btn btn-secondary btn-sm" href={url} target="_blank" rel="noopener">
               <ExternalIcon />
-              Open
+              {r.open}
             </a>
           )}
           <a
@@ -166,7 +169,7 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
             data-testid="download"
           >
             <DownloadIcon />
-            Download
+            {r.download}
           </a>
         </div>
       </div>
