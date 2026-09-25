@@ -1,0 +1,39 @@
+---
+import PolicyLayout from '~/layouts/PolicyLayout.astro';
+import { SITE } from '~/config/site';
+import { ADS } from '~/config/ads';
+---
+
+<PolicyLayout
+  title="Cookie Policy"
+  description="Which cookies Formatoza and its advertising partners use, why, and how to manage your consent and privacy choices."
+  path="/cookies/"
+  h1="Cookie policy"
+  lead={`${SITE.name} does not set its own cookies. This page explains the cookies used by advertising partners and how to control them.`}
+  updated="September 25, 2026"
+>
+  <h2>Cookies set by {SITE.name}</h2>
+  <p>
+    None. The converters need no cookies: files are processed in your browser and nothing about them is stored. The site does not use local storage to
+    track you.
+  </p>
+  <h2>Advertising cookies</h2>
+  <p>
+    {ADS.enabled ? 'We show ads served by Google AdSense.' : 'When advertising is enabled, ads are served by Google AdSense.'} Google and its partners may
+    set cookies (such as <code>__gads</code>, <code>__gpi</code> and <code>IDE</code>) or use similar technologies to deliver and measure ads, prevent
+    fraud and — only with consent where required — personalise ads. See
+    <a href="https://policies.google.com/technologies/cookies" rel="noopener">how Google uses cookies</a> for the current list and their purposes.
+  </p>
+  <h2>Consent</h2>
+  <p>
+    In the European Economic Area, the United Kingdom and Switzerland, a consent message from a Google-certified consent management platform asks for
+    your choice before advertising cookies are used for personalisation. The page sets consent to “denied” by default for those regions before any
+    advertising code loads.
+  </p>
+  <h2>Managing your choices</h2>
+  <ul>
+    <li>Use “Privacy choices” in the site footer to review or change your consent (available when advertising is active).</li>
+    <li>Manage personalised ads in <a href="https://adssettings.google.com/" rel="noopener">Google Ads Settings</a>.</li>
+    <li>Block or delete cookies in your browser settings; the converters keep working without cookies.</li>
+  </ul>
+</PolicyLayout>

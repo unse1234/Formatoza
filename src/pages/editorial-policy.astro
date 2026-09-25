@@ -1,0 +1,46 @@
+---
+import PolicyLayout from '~/layouts/PolicyLayout.astro';
+import { SITE } from '~/config/site';
+---
+
+<PolicyLayout
+  title="Editorial and Quality Policy"
+  description="How Formatoza writes, tests and corrects its converter pages and guides: format-specific facts, tested claims, honest limitations and a clear corrections process."
+  path="/editorial-policy/"
+  h1="Editorial and quality policy"
+  lead="Every page on Formatoza exists to help someone convert a file correctly. This policy describes how we keep that promise."
+>
+  <h2>Principles</h2>
+  <ul>
+    <li><strong>Specific, not generic.</strong> Each converter page explains the actual formats involved — why they exist, where they break, what the conversion keeps and loses. We do not publish pages that differ only by format names.</li>
+    <li><strong>Claims match behaviour.</strong> Statements about what a tool does — how it handles transparency, delimiters, multi-page files or malformed input — describe the tool's implemented behaviour, which is covered by automated tests with sample files.</li>
+    <li><strong>Limitations are stated up front.</strong> Every converter lists what it cannot do. We don't claim “perfect” or “lossless” results where that isn't true.</li>
+    <li><strong>A working tool on every page.</strong> We only publish a converter page when the converter works in current browsers.</li>
+  </ul>
+  <h2>How pages are produced</h2>
+  <p>
+    Content is drafted from a structured knowledge base of format facts, specifications (such as RFC 4180 for CSV, RFC 4648 for Base64 and the W3C
+    WebVTT specification) and our own testing. We use software tools, including AI writing assistants, to help draft and edit text; every page is then
+    checked against the converter's real, tested behaviour before it is published.
+  </p>
+  <h2>Testing</h2>
+  <p>
+    Every conversion engine has automated tests covering valid files, empty and malformed input, large inputs, Unicode text, multiple files and file-name
+    handling. Browser tests exercise each converter page end to end with real sample files.
+  </p>
+  <h2>Reviews and updates</h2>
+  <p>
+    Pages show the date they were last reviewed. We revisit pages when browser support changes (for example new AVIF or HEIC support), when libraries
+    are updated, or when readers report problems.
+  </p>
+  <h2>Corrections</h2>
+  <p>
+    If something on the site is wrong or out of date, email <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>. We correct factual errors
+    promptly and update the review date.
+  </p>
+  <h2>Advertising and independence</h2>
+  <p>
+    Advertising funds the site but does not influence content. Ads are labelled, kept outside the converter, and never styled to look like download
+    buttons. We do not accept payment for recommendations.
+  </p>
+</PolicyLayout>

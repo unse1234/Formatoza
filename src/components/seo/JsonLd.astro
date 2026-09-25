@@ -1,0 +1,9 @@
+---
+interface Props {
+  /** Pre-serialised JSON-LD (use `graph()` from ~/lib/seo/jsonld). */
+  json: string;
+}
+const { json } = Astro.props;
+---
+
+<script is:inline type="application/ld+json" set:html={json} />

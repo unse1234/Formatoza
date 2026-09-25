@@ -1,0 +1,45 @@
+---
+import PolicyLayout from '~/layouts/PolicyLayout.astro';
+import { CONVERSIONS, CATEGORY_LIST } from '~/lib/catalog/registry';
+import { SITE } from '~/config/site';
+---
+
+<PolicyLayout
+  title="About Formatoza — Private, In-Browser File Conversion"
+  description="Formatoza is an independent collection of free file converters that run in your browser. Learn why we built it, how it is funded and what we promise."
+  path="/about/"
+  h1="About Formatoza"
+  lead="Formatoza is a collection of file converters built on one idea: converting a file should not require handing it to a stranger's server."
+>
+  <h2>What we do</h2>
+  <p>
+    Formatoza offers {CONVERSIONS.length} converters across {CATEGORY_LIST.length} categories — images, PDF, data, developer formats, subtitles and documents.
+    Each converter runs entirely in your web browser: the page downloads the conversion code, and your device does the work. Your files are
+    never uploaded to us.
+  </p>
+  <h2>Why we built it</h2>
+  <p>
+    Converting a file is usually a small, urgent task — a photo that won't open, a spreadsheet a system won't accept, subtitles in the wrong
+    format. Most online converters handle it by uploading your file to their servers, often with queues, size limits, sign-ups and watermarks.
+    Modern browsers are powerful enough to do these conversions locally, which is faster and keeps private documents private.
+  </p>
+  <h2>What we promise</h2>
+  <ul>
+    <li><strong>Local processing.</strong> Every converter that says “processed in your browser” genuinely never sends your file anywhere.</li>
+    <li><strong>Honest limits.</strong> Each tool explains what it keeps and what it loses. We don't claim fidelity our tests don't demonstrate.</li>
+    <li><strong>No account, no watermark.</strong> Every tool is free to use without registration.</li>
+    <li><strong>Ads stay out of the way.</strong> Advertising, when shown, is clearly labelled and never placed inside the converter or near download buttons.</li>
+  </ul>
+  <h2>How Formatoza is funded</h2>
+  <p>
+    Formatoza is funded by advertising. Because conversion happens on your device, running the site costs very little, which is what lets us keep
+    every tool free. See our <a href="/privacy/">privacy policy</a> for how advertising works and what choices you have.
+  </p>
+  <h2>How content is made</h2>
+  <p>
+    Every converter page explains the specific formats involved and documents the tool's real behaviour and limitations. Read our
+    <a href="/editorial-policy/">editorial policy</a> for how pages are written, tested and corrected.
+  </p>
+  <h2>Contact</h2>
+  <p>Questions, bug reports and suggestions for new converters are welcome at <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>.</p>
+</PolicyLayout>

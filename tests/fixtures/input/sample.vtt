@@ -1,0 +1,21 @@
+WEBVTT - fixture
+
+NOTE a comment
+
+STYLE
+::cue { color: yellow }
+
+cue-1
+00:00:01.000 --> 00:00:03.500 line:0 align:center
+<v Narrator>Previously…
+
+00:04.000 --> 00:06.250
+<v Sam>We need to <b>talk</b> &amp; listen.
+
+00:00:06.250 --> 00:00:08.000
+We need to talk.
+Rolling line two
+
+00:00:08.000 --> 00:00:10.000
+Rolling line two
+Rolling line three

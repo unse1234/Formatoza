@@ -1,0 +1,396 @@
+{
+  "heic": {
+    "name": "HEIC",
+    "fullName": "High Efficiency Image Container",
+    "kind": "image",
+    "extensions": [".heic", ".heif"],
+    "mimeTypes": ["image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"],
+    "summary": "HEIC is the HEIF container holding HEVC (H.265) compressed images. Apple made it the default camera format with iOS 11 in 2017 because it stores a photo in roughly half the space of a comparable JPEG, and it can carry 10-bit color, depth maps, alpha and image sequences such as Live Photo stills. The catch is compatibility: HEVC is patent-encumbered, so most browsers (other than Safari 17+), many Windows installs, older Android devices and countless upload forms cannot open it.",
+    "traits": {
+      "compression": "Lossy HEVC (H.265) intra-frame coding",
+      "transparency": "Supported by the format; rare in camera photos",
+      "animation": "Image sequences (bursts, Live Photo stills)",
+      "colorDepth": "8 or 10 bits per channel, wide-gamut Display P3",
+      "support": "Safari 17+, Apple devices; Windows needs extra codecs; Chrome and Firefox cannot display it",
+      "bestFor": "Storing phone photos compactly inside the Apple ecosystem"
+    }
+  },
+  "avif": {
+    "name": "AVIF",
+    "fullName": "AV1 Image File Format",
+    "kind": "image",
+    "extensions": [".avif"],
+    "mimeTypes": ["image/avif"],
+    "summary": "AVIF stores still images and animations compressed with the royalty-free AV1 video codec inside a HEIF container. Published by the Alliance for Open Media in 2019, it typically beats both JPEG and WebP on file size at equal visual quality, supports alpha, HDR and 10/12-bit color, and is increasingly served by image CDNs. Modern browsers display it, but plenty of desktop software, email clients, office suites and upload forms still reject .avif files.",
+    "traits": {
+      "compression": "Lossy or lossless AV1 intra-frame coding",
+      "transparency": "Full alpha channel",
+      "animation": "Supported (AV1 image sequences)",
+      "colorDepth": "8, 10 or 12 bits per channel; HDR capable",
+      "support": "Chrome 85+, Firefox 93+, Safari 16.4+; patchy in desktop apps and upload forms",
+      "bestFor": "Web delivery where the smallest file wins"
+    }
+  },
+  "webp": {
+    "name": "WebP",
+    "fullName": "WebP image",
+    "kind": "image",
+    "extensions": [".webp"],
+    "mimeTypes": ["image/webp"],
+    "summary": "WebP is Google's 2010 web image format based on VP8 intra-frame coding, later extended with a separate lossless mode, alpha and animation. Google's own comparison found lossy WebP files 25–34% smaller than JPEGs at equivalent SSIM quality. Every current browser supports it, which is why many websites now serve WebP automatically — and why people end up with .webp downloads that older photo editors, office documents and some print services will not accept.",
+    "traits": {
+      "compression": "Lossy (VP8) or lossless",
+      "transparency": "Full alpha channel in both modes",
+      "animation": "Supported",
+      "colorDepth": "8 bits per channel, 4:2:0 chroma in lossy mode",
+      "support": "All current browsers; mixed in older desktop software",
+      "bestFor": "Web pages that need smaller images than JPEG or PNG"
+    }
+  },
+  "jpg": {
+    "name": "JPG",
+    "fullName": "JPEG (Joint Photographic Experts Group)",
+    "kind": "image",
+    "extensions": [".jpg", ".jpeg", ".jfif", ".jpe"],
+    "mimeTypes": ["image/jpeg"],
+    "summary": "JPEG, standardised in 1992, compresses photographs by discarding detail the eye is less sensitive to (via the discrete cosine transform on 8×8 blocks). It has no transparency and no animation, and every re-save loses a little more quality, but it is the most compatible image format in existence: every camera, phone, browser, operating system, office suite, printer and upload form accepts it.",
+    "traits": {
+      "compression": "Lossy DCT; quality chosen at save time",
+      "transparency": "Not supported",
+      "animation": "Not supported",
+      "colorDepth": "8 bits per channel",
+      "support": "Universal",
+      "bestFor": "Photos that must open anywhere"
+    }
+  },
+  "png": {
+    "name": "PNG",
+    "fullName": "Portable Network Graphics",
+    "kind": "image",
+    "extensions": [".png"],
+    "mimeTypes": ["image/png"],
+    "summary": "PNG was created in 1996 as a patent-free replacement for GIF. It is lossless — pixels decode exactly as they were saved — and supports a full alpha channel, which makes it the default for screenshots, logos, UI graphics and anything with sharp edges or text. The trade-off is size: a photograph saved as PNG is often several times larger than the same photo as a JPEG.",
+    "traits": {
+      "compression": "Lossless DEFLATE with per-row prediction filters",
+      "transparency": "Full alpha channel",
+      "animation": "Only via the APNG extension",
+      "colorDepth": "Palette, 8 or 16 bits per channel",
+      "support": "Universal",
+      "bestFor": "Screenshots, logos, graphics with transparency or text"
+    }
+  },
+  "svg": {
+    "name": "SVG",
+    "fullName": "Scalable Vector Graphics",
+    "kind": "image",
+    "extensions": [".svg"],
+    "mimeTypes": ["image/svg+xml"],
+    "summary": "SVG is an XML-based W3C format that describes shapes, paths, gradients and text instead of pixels, so it stays sharp at any size. That makes it ideal for logos and icons on the web — but many places that accept images (social networks, marketplaces, office apps, email) reject SVG, partly because an SVG file can contain scripts and external references. Rasterising to PNG or JPG produces a fixed-size image those places accept.",
+    "traits": {
+      "compression": "Plain XML text (optionally gzipped as .svgz)",
+      "transparency": "Yes — anything not drawn is transparent",
+      "animation": "Via SMIL or CSS (not preserved when rasterised)",
+      "colorDepth": "Resolution-independent vector drawing",
+      "support": "All browsers; limited in office apps, social platforms and many upload forms",
+      "bestFor": "Logos, icons and illustrations that must scale"
+    }
+  },
+  "gif": {
+    "name": "GIF",
+    "fullName": "Graphics Interchange Format",
+    "kind": "image",
+    "extensions": [".gif"],
+    "mimeTypes": ["image/gif"],
+    "summary": "GIF dates from 1987 (CompuServe). Each frame is limited to a palette of at most 256 colors and compressed losslessly with LZW. Its support for multiple frames is why it became the internet's format for short looping animations, and it supports single-color (on/off) transparency. For still images it is almost always a poor choice today: colors get dithered and files are larger than PNG.",
+    "traits": {
+      "compression": "Lossless LZW, but limited to 256 colors per frame",
+      "transparency": "1-bit (a pixel is fully transparent or fully opaque)",
+      "animation": "Supported — the format's main use today",
+      "colorDepth": "Up to 8 bits per pixel (palette)",
+      "support": "Universal",
+      "bestFor": "Short, simple looping animations"
+    }
+  },
+  "bmp": {
+    "name": "BMP",
+    "fullName": "Windows Bitmap (Device-Independent Bitmap)",
+    "kind": "image",
+    "extensions": [".bmp", ".dib"],
+    "mimeTypes": ["image/bmp", "image/x-ms-bmp"],
+    "summary": "BMP is the native bitmap format of Windows, dating back to Windows 1.0/OS2. Files are usually stored uncompressed, row by row (often bottom-up), which makes them simple to read but enormous: a 12-megapixel photo is about 36 MB as a 24-bit BMP. BMPs still come out of older scanners, screenshot tools, industrial equipment and legacy software.",
+    "traits": {
+      "compression": "Usually none; optional RLE for palette images",
+      "transparency": "Only in rare 32-bit variants",
+      "animation": "Not supported",
+      "colorDepth": "1, 4, 8, 16, 24 or 32 bits per pixel",
+      "support": "Windows and all browsers; rejected by many upload forms because of size",
+      "bestFor": "Legacy software and raw pixel interchange"
+    }
+  },
+  "tiff": {
+    "name": "TIFF",
+    "fullName": "Tagged Image File Format",
+    "kind": "image",
+    "extensions": [".tif", ".tiff"],
+    "mimeTypes": ["image/tiff"],
+    "summary": "TIFF, created by Aldus in 1986 and now maintained by Adobe, is a flexible container used in scanning, print production, faxing, archiving and GIS. A single file can hold several pages and use one of many compression schemes (none, LZW, Deflate, PackBits, CCITT fax, JPEG). That flexibility is also its weakness: no browser except Safari displays TIFF, and most web forms refuse it.",
+    "traits": {
+      "compression": "None, LZW, Deflate, PackBits, CCITT or JPEG",
+      "transparency": "Optional alpha / extra samples",
+      "animation": "No, but multiple pages per file",
+      "colorDepth": "1 to 32 bits per channel, RGB, CMYK or grayscale",
+      "support": "Image editors and print tools; only Safari among browsers",
+      "bestFor": "Scans, print masters and archival images"
+    }
+  },
+  "ico": {
+    "name": "ICO",
+    "fullName": "Windows Icon",
+    "kind": "image",
+    "extensions": [".ico"],
+    "mimeTypes": ["image/x-icon", "image/vnd.microsoft.icon"],
+    "summary": "ICO is the Windows icon container, also the classic favicon.ico format for websites. One .ico file bundles several versions of the same icon at different sizes (commonly 16, 32, 48 and 256 pixels), each stored as either a PNG or an uncompressed BMP-style bitmap with an optional transparency mask. Most image editors and design tools don't open .ico files directly.",
+    "traits": {
+      "compression": "Each entry is PNG or uncompressed DIB",
+      "transparency": "Alpha channel or 1-bit AND mask",
+      "animation": "Not supported (see .ani)",
+      "colorDepth": "1 to 32 bits per pixel, per entry",
+      "support": "Windows, browsers (as favicons); few editors",
+      "bestFor": "Windows application icons and favicons"
+    }
+  },
+  "pdf": {
+    "name": "PDF",
+    "fullName": "Portable Document Format",
+    "kind": "document",
+    "extensions": [".pdf"],
+    "mimeTypes": ["application/pdf"],
+    "summary": "PDF, introduced by Adobe in 1993 and standardised as ISO 32000, describes fixed-layout pages: text positioned with embedded fonts, vector drawings and images, so a document looks the same on every device and printer. That is why forms, invoices, contracts and scans travel as PDF. A PDF made from a scanner, however, often contains only a picture of each page with no real text layer.",
+    "traits": {
+      "structure": "Fixed-layout pages with text, vectors and images",
+      "editability": "Designed for viewing and printing, not editing",
+      "support": "Universal viewers in browsers and operating systems",
+      "bestFor": "Sharing, printing and submitting final documents"
+    }
+  },
+  "docx": {
+    "name": "DOCX",
+    "fullName": "Word document (Office Open XML)",
+    "kind": "document",
+    "extensions": [".docx"],
+    "mimeTypes": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+    "summary": "DOCX is the Office Open XML word-processing format introduced with Word 2007 and standardised as ECMA-376 / ISO/IEC 29500. A .docx file is a ZIP archive containing XML parts for the body text, styles, numbering, headers, footers, comments and embedded media. It is reflowable rather than fixed-layout, so the same document can look different in Word, Google Docs and LibreOffice.",
+    "traits": {
+      "structure": "ZIP of XML parts: paragraphs, runs, styles, tables, media",
+      "editability": "Fully editable",
+      "support": "Word, Google Docs, LibreOffice, Pages",
+      "bestFor": "Documents that are still being written or edited"
+    }
+  },
+  "csv": {
+    "name": "CSV",
+    "fullName": "Comma-Separated Values",
+    "kind": "data",
+    "extensions": [".csv"],
+    "mimeTypes": ["text/csv"],
+    "summary": "CSV stores a table as plain text: one record per line, fields separated by commas, and fields containing commas, quotes or line breaks wrapped in double quotes (with quotes doubled), as described in RFC 4180. It has no data types, no nesting and no declared encoding, and many European spreadsheet locales write semicolons instead of commas. It is still the lowest common denominator for exporting data from spreadsheets, databases and SaaS tools.",
+    "traits": {
+      "structure": "Flat table: rows and columns",
+      "dataTypes": "None — every value is text",
+      "nesting": "Not supported",
+      "comments": "Not supported",
+      "support": "Every spreadsheet, database and data tool",
+      "bestFor": "Moving tabular data between tools"
+    }
+  },
+  "tsv": {
+    "name": "TSV",
+    "fullName": "Tab-Separated Values",
+    "kind": "data",
+    "extensions": [".tsv", ".tab"],
+    "mimeTypes": ["text/tab-separated-values"],
+    "summary": "TSV is a table in plain text with a tab character between fields. Because tabs rarely occur inside real values, TSV usually needs no quoting at all, which makes it easy to process with command-line tools — and it is what spreadsheets put on the clipboard when you copy cells. The IANA definition does not allow tabs or line breaks inside fields, so values containing them must be quoted or escaped.",
+    "traits": {
+      "structure": "Flat table: rows and columns",
+      "dataTypes": "None — every value is text",
+      "nesting": "Not supported",
+      "comments": "Not supported",
+      "support": "Spreadsheets, Unix tools, bioinformatics and data warehouses",
+      "bestFor": "Clipboard exchange and command-line processing"
+    }
+  },
+  "json": {
+    "name": "JSON",
+    "fullName": "JavaScript Object Notation",
+    "kind": "data",
+    "extensions": [".json"],
+    "mimeTypes": ["application/json"],
+    "summary": "JSON (RFC 8259 / ECMA-404) represents data as nested objects and arrays of strings, numbers, booleans and null. It is the default format of web APIs, configuration files and NoSQL databases because every programming language can parse it. It has no comments, no date type and no schema built in, and numbers are only as precise as the parser reading them.",
+    "traits": {
+      "structure": "Tree of objects and arrays",
+      "dataTypes": "String, number, boolean, null",
+      "nesting": "Unlimited",
+      "comments": "Not allowed",
+      "support": "Every programming language and web API",
+      "bestFor": "APIs, app data and configuration"
+    }
+  },
+  "xml": {
+    "name": "XML",
+    "fullName": "Extensible Markup Language",
+    "kind": "data",
+    "extensions": [".xml"],
+    "mimeTypes": ["application/xml", "text/xml"],
+    "summary": "XML, a W3C recommendation since 1998, marks data up with nested elements and attributes. It supports namespaces, schemas (XSD), comments and mixed text, which is why it underpins RSS feeds, SOAP services, sitemaps, SVG, Office documents and many enterprise and government data exchanges. It is verbose, and it distinguishes attributes from child elements — a distinction JSON, CSV and YAML don't have.",
+    "traits": {
+      "structure": "Tree of elements with attributes and text",
+      "dataTypes": "Text only, unless a schema says otherwise",
+      "nesting": "Unlimited",
+      "comments": "Supported",
+      "support": "Enterprise systems, feeds, office formats, every language",
+      "bestFor": "Document-centric and schema-validated data exchange"
+    }
+  },
+  "yaml": {
+    "name": "YAML",
+    "fullName": "YAML Ain't Markup Language",
+    "kind": "data",
+    "extensions": [".yaml", ".yml"],
+    "mimeTypes": ["application/yaml", "text/yaml"],
+    "summary": "YAML expresses the same kind of data as JSON — mappings, sequences and scalars — using indentation instead of braces, and adds comments, multi-line strings, anchors/aliases and multiple documents per file. YAML 1.2 is a superset of JSON. It is the configuration language of Kubernetes, Docker Compose, GitHub Actions, Ansible and many static-site generators, where its readability matters more than parsing speed.",
+    "traits": {
+      "structure": "Tree of mappings and sequences, indentation-based",
+      "dataTypes": "Strings, numbers, booleans, null, timestamps (schema-dependent)",
+      "nesting": "Unlimited",
+      "comments": "Supported (#)",
+      "support": "DevOps tooling, CI systems and most languages via libraries",
+      "bestFor": "Human-edited configuration"
+    }
+  },
+  "xlsx": {
+    "name": "XLSX",
+    "fullName": "Excel workbook (Office Open XML)",
+    "kind": "data",
+    "extensions": [".xlsx"],
+    "mimeTypes": ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    "summary": "XLSX is the Office Open XML spreadsheet format used by Excel since 2007: a ZIP archive of XML parts describing worksheets, shared strings, styles and more. Unlike CSV it stores cell types, multiple sheets, formatting, formulas and frozen panes. A worksheet holds at most 1,048,576 rows by 16,384 columns, and a cell at most 32,767 characters.",
+    "traits": {
+      "structure": "Workbook of typed worksheets (ZIP of XML)",
+      "dataTypes": "Numbers, text, booleans, dates (as serial numbers), formulas",
+      "nesting": "Not supported (grid only)",
+      "comments": "Cell notes supported",
+      "support": "Excel, Google Sheets, LibreOffice Calc, Numbers",
+      "bestFor": "Spreadsheets people will open, filter and format"
+    }
+  },
+  "markdown": {
+    "name": "Markdown",
+    "fullName": "Markdown",
+    "kind": "markup",
+    "extensions": [".md", ".markdown", ".mdown", ".mkd"],
+    "mimeTypes": ["text/markdown"],
+    "summary": "Markdown, created by John Gruber in 2004, is a plain-text syntax for formatting: # for headings, * or - for lists, **bold**, [links](url) and fenced code blocks. The original description was ambiguous, so CommonMark (2014) specified it precisely, and GitHub Flavored Markdown added tables, task lists, strikethrough and autolinks. README files, documentation sites, note apps and chat tools all use it.",
+    "traits": {
+      "structure": "Plain text with lightweight formatting marks",
+      "support": "GitHub, GitLab, documentation tools, note apps, chat apps",
+      "bestFor": "Writing formatted text that stays readable as plain text"
+    }
+  },
+  "html": {
+    "name": "HTML",
+    "fullName": "HyperText Markup Language",
+    "kind": "markup",
+    "extensions": [".html", ".htm", ".xhtml"],
+    "mimeTypes": ["text/html"],
+    "summary": "HTML is the markup language of the web, maintained by WHATWG as a living standard. Elements such as <h1>, <p>, <ul>, <table> and <a> describe the structure and meaning of content, while CSS and JavaScript add presentation and behaviour. HTML copied from web pages, CMS editors and email templates often carries inline styles, wrapper <div>s and scripts on top of the actual content.",
+    "traits": {
+      "structure": "Tree of elements (DOM)",
+      "support": "Every browser, email client and CMS",
+      "bestFor": "Publishing documents on the web"
+    }
+  },
+  "txt": {
+    "name": "Text",
+    "fullName": "Plain text",
+    "kind": "markup",
+    "extensions": [".txt", ".text"],
+    "mimeTypes": ["text/plain"],
+    "summary": "Plain text is just characters and line breaks — no fonts, links, bold or layout. Today it is almost always UTF-8, which can represent every script and emoji. It is the most durable and searchable form of content, accepted by every editor, form field, command-line tool and language model.",
+    "traits": {
+      "structure": "Characters and line breaks only",
+      "support": "Universal",
+      "bestFor": "Searching, pasting, archiving and processing text"
+    }
+  },
+  "base64": {
+    "name": "Base64",
+    "fullName": "Base64 encoding",
+    "kind": "encoding",
+    "extensions": [".b64", ".txt"],
+    "mimeTypes": ["text/plain"],
+    "summary": "Base64 (RFC 4648) represents arbitrary bytes using 64 safe ASCII characters (A–Z, a–z, 0–9, + and /), so binary data can travel through systems that only handle text: email attachments (MIME), data: URLs, JSON payloads, HTTP Basic auth headers and JWTs. Every 3 bytes become 4 characters, so encoded data is about 33% larger. Base64 is an encoding, not encryption — anyone can decode it.",
+    "traits": {
+      "alphabet": "A–Z a–z 0–9 + / with = padding (URL-safe variant uses - and _)",
+      "sizeOverhead": "About +33% (4 characters per 3 bytes)",
+      "bestFor": "Embedding bytes in text-only channels"
+    }
+  },
+  "urlencoded": {
+    "name": "URL-encoded",
+    "fullName": "Percent-encoding (URL encoding)",
+    "kind": "encoding",
+    "extensions": [".txt"],
+    "mimeTypes": ["text/plain"],
+    "summary": "Percent-encoding, defined in RFC 3986, replaces characters that are not allowed or have special meaning in a URL with % followed by two hex digits of their UTF-8 bytes — a space becomes %20, é becomes %C3%A9. HTML form submissions use a close relative, application/x-www-form-urlencoded, where spaces become +. Getting the encoding wrong is a classic source of broken links, double-encoded %2520 sequences and query parameters that are cut off at an & sign.",
+    "traits": {
+      "alphabet": "Unreserved A–Z a–z 0–9 - . _ ~ kept; everything else as %XX",
+      "sizeOverhead": "Up to 3× for encoded bytes (9 characters for a 3-byte UTF-8 character)",
+      "bestFor": "Query strings, path segments and form bodies"
+    }
+  },
+  "srt": {
+    "name": "SRT",
+    "fullName": "SubRip Subtitle",
+    "kind": "subtitle",
+    "extensions": [".srt"],
+    "mimeTypes": ["application/x-subrip", "text/plain"],
+    "summary": "SRT comes from SubRip, a Windows tool that extracted subtitles from DVDs around 2000. Each cue is a counter, a time range written HH:MM:SS,mmm --> HH:MM:SS,mmm (note the comma before milliseconds), and one or more lines of text. It has no official specification and supports only basic tags like <i>, <b>, <u> and <font color>, but almost every video player, editor and platform imports it.",
+    "traits": {
+      "timestamps": "HH:MM:SS,mmm — comma before milliseconds",
+      "styling": "Basic <i>, <b>, <u>, <font color> (support varies)",
+      "positioning": "Not supported (some players read {\\an8})",
+      "support": "Nearly every player, editor and video platform",
+      "bestFor": "Maximum compatibility"
+    }
+  },
+  "vtt": {
+    "name": "VTT",
+    "fullName": "WebVTT (Web Video Text Tracks)",
+    "kind": "subtitle",
+    "extensions": [".vtt"],
+    "mimeTypes": ["text/vtt"],
+    "summary": "WebVTT is the W3C caption format for HTML5 video: the <track> element only accepts WebVTT. A file must start with the line WEBVTT, timestamps use a dot before milliseconds (hours are optional), and cues can carry settings for position, line, size and alignment, voice spans (<v Speaker>), classes for CSS ::cue styling, NOTE comments and STYLE blocks.",
+    "traits": {
+      "timestamps": "[HH:]MM:SS.mmm — dot before milliseconds",
+      "styling": "<b>, <i>, <u>, <c.class>, <v voice> plus CSS ::cue",
+      "positioning": "Cue settings: line, position, size, align, region",
+      "support": "Browsers (HTML5 <track>), web players, streaming platforms",
+      "bestFor": "Captions on web video"
+    }
+  },
+  "ass": {
+    "name": "ASS",
+    "fullName": "Advanced SubStation Alpha",
+    "kind": "subtitle",
+    "extensions": [".ass", ".ssa"],
+    "mimeTypes": ["text/x-ssa", "text/plain"],
+    "summary": "Advanced SubStation Alpha (v4+) grew out of the SubStation Alpha editor and is today mostly written with Aegisub. An .ass file is an INI-like script with [Script Info], [V4+ Styles] and [Events] sections: named styles define fonts, colors, outlines and margins, and inline override tags such as {\\pos(x,y)}, {\\fad}, {\\k} karaoke timing and {\\an8} placement allow typesetting that plain SRT or VTT cannot express. Timestamps use centiseconds: H:MM:SS.cc.",
+    "traits": {
+      "timestamps": "H:MM:SS.cc — centisecond precision",
+      "styling": "Named styles plus override tags (fonts, colors, borders, effects)",
+      "positioning": "Absolute positioning, alignment, rotation, movement",
+      "support": "VLC, mpv, MPC-HC, Aegisub, fansub workflows; rarely web players",
+      "bestFor": "Styled, typeset or karaoke subtitles"
+    }
+  }
+}

@@ -1,0 +1,152 @@
+---
+/**
+ * Homepage: zero framework JavaScript (only the small search script).
+ * Every converter is linked from here for crawlability.
+ */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Search from '~/components/layout/Search.astro';
+import TrustStrip from '~/components/ui/TrustStrip.astro';
+import FAQ from '~/components/ui/FAQ.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { CATEGORY_LIST, conversionsInCategory, getConversionMeta } from '~/lib/catalog/registry';
+import { CONVERSIONS } from '~/lib/catalog/registry';
+import { graph, organization, website } from '~/lib/seo/jsonld';
+import { getCollection } from 'astro:content';
+import { SITE } from '~/config/site';
+
+const popular = ['heic-to-jpg', 'webp-to-png', 'jpg-to-pdf', 'pdf-to-png', 'csv-to-json', 'avif-to-jpg', 'srt-to-vtt', 'markdown-to-html'].map(getConversionMeta);
+const guides = (await getCollection('guides')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const faq = [
+  {
+    q: 'Are my files uploaded to a server?',
+    a: 'No. Every converter on Formatoza runs inside your browser tab using JavaScript and WebAssembly. Your files are read, converted and offered for download on your own device; they are never sent to our servers.',
+  },
+  {
+    q: 'Is Formatoza really free?',
+    a: 'Yes. All converters are free, with no account, no daily limits and no watermarks. The site is supported by advertising shown next to the content, never inside the converter.',
+  },
+  {
+    q: 'Why is in-browser conversion possible now?',
+    a: 'Modern browsers can decode most image formats natively, render PDFs with PDF.js, run WebAssembly decoders for formats like HEIC, and process data in background workers — fast enough that uploading files to a server is unnecessary for these conversions.',
+  },
+  {
+    q: 'What are the limits?',
+    a: 'Each tool lists its own limits, typically 10–200 MB per file depending on the format, because very large files can exhaust a browser’s memory. Heavy formats such as video are not offered yet for the same reason.',
+  },
+];
+---
+
+<BaseLayout
+  meta={{ title: 'Formatoza — Free File Converters That Run in Your Browser', description: SITE.description, path: '/', brandSuffix: false }}
+  jsonLd={graph(organization(), website())}
+  hideHeaderSearch
+>
+  <section class="container-page pt-14 pb-10 sm:pt-20">
+    <p class="t-eyebrow flex items-center gap-2"><span class="dot bg-dot-green" aria-hidden="true"></span>{CONVERSIONS.length} converters · processed on your device</p>
+    <h1 class="t-display mt-4 max-w-3xl">Convert files without uploading them.</h1>
+    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-fg-2">
+      Images, PDFs, spreadsheets, data, subtitles and documents — converted by your own browser. No sign-up, no queue, no copies of your files on
+      anyone's server.
+    </p>
+    <div class="mt-8"><Search variant="hero" id="hero-search" /></div>
+    <ul class="mt-5 flex flex-wrap gap-2" aria-label="Popular converters">
+      {
+        popular.map((c) => (
+          <li>
+            <a href={c.path} class="chip h-8 gap-1.5 px-3 font-mono text-[12.5px] transition-colors hover:bg-hover hover:text-fg">
+              {c.source.name}
+              <Icon name="arrow-right" size={12} class="text-fg-3" />
+              {c.target.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="container-page" aria-labelledby="index-h">
+    <div class="flex items-end justify-between gap-4">
+      <h2 id="index-h" class="t-title">Every converter</h2>
+      <p class="hidden text-sm text-fg-3 sm:block">Press <kbd class="rounded px-1.5 font-mono text-xs shadow-border">/</kbd> to search</p>
+    </div>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        CATEGORY_LIST.map((cat) => (
+          <section class="card flex flex-col p-5" aria-labelledby={`cat-${cat.id}`}>
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 id={`cat-${cat.id}`} class="text-base font-semibold tracking-[-0.02em]">
+                <a href={`/${cat.path}/`} class="hover:text-accent">
+                  {cat.name}
+                </a>
+              </h3>
+              <span class="font-mono text-xs text-fg-3">{conversionsInCategory(cat.id).length}</span>
+            </div>
+            <ul class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {conversionsInCategory(cat.id).map((c) => (
+                <li>
+                  <a href={c.path} class="group flex items-center gap-1.5 rounded-sm py-0.5 font-mono text-[12.5px] text-fg-2 hover:text-fg" title={c.h1}>
+                    <span>{c.source.name}</span>
+                    <span class="text-fg-3 group-hover:text-accent" aria-hidden="true">→</span>
+                    <span class="sr-only">to</span>
+                    <span>{c.target.name}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="container-page mt-20" aria-labelledby="how-h">
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+      <div>
+        <h2 id="how-h" class="t-title">Your files stay on your device</h2>
+        <p class="mt-4 leading-relaxed text-fg-2">
+          Most online converters upload your file, process it on a server and ask you to download the result. Formatoza sends the converter to you
+          instead: the page downloads the conversion code, and your browser does the work. It's faster — there's no upload — and private by design.
+        </p>
+        <a href="/how-it-works/" class="link mt-4 inline-block text-sm">How in-browser conversion works →</a>
+      </div>
+      <ol class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+        {
+          [
+            ['Drop or paste', 'Choose files, drag them in, or paste text and images from the clipboard.'],
+            ['Convert locally', 'Decoders and encoders run in this tab — heavy ones load only when a tool needs them.'],
+            ['Download', 'Save each file or everything as a ZIP. Close the tab and nothing remains.'],
+          ].map(([t, d], i) => (
+            <li class="flex gap-4 rounded-lg bg-surface p-5 shadow-border">
+              <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-fg font-mono text-xs font-medium text-on-fg">{i + 1}</span>
+              <div>
+                <h3 class="text-[15px] font-semibold tracking-[-0.01em]">{t}</h3>
+                <p class="mt-1 text-sm text-fg-2">{d}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <TrustStrip class="mt-10" processing="local" />
+  </section>
+
+  <section class="container-page mt-20" aria-labelledby="guides-h">
+    <h2 id="guides-h" class="t-title">Guides</h2>
+    <p class="mt-3 max-w-2xl text-fg-2">Short, practical explanations of the formats behind the converters.</p>
+    <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        guides.map((g) => (
+          <li>
+            <a href={`/guides/${g.id}/`} class="group flex h-full flex-col gap-2 rounded-lg bg-surface p-5 shadow-border hover:shadow-large">
+              <Icon name="book" class="text-fg-3" />
+              <span class="text-[15px] font-semibold tracking-[-0.01em] group-hover:text-accent">{g.data.h1}</span>
+              <span class="text-sm text-fg-2">{g.data.summary}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <div class="container-page mt-20 max-w-3xl"><FAQ items={faq} /></div>
+</BaseLayout>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Ana Souza",
+    "tags": [
+      "admin",
+      "editor"
+    ],
+    "address": {
+      "city": "São Paulo",
+      "zip": "01310-100"
+    },
+    "active": true
+  },
+  {
+    "id": 2,
+    "name": "Lee Min-jun 👋",
+    "tags": [],
+    "address": {
+      "city": "서울",
+      "zip": "04524"
+    },
+    "active": false,
+    "note": null
+  }
+]

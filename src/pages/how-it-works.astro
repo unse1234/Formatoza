@@ -1,0 +1,48 @@
+---
+import PolicyLayout from '~/layouts/PolicyLayout.astro';
+---
+
+<PolicyLayout
+  title="How In-Browser File Conversion Works"
+  description="How Formatoza converts files without uploading them: browser decoders, WebAssembly, Web Workers and lazy loading — and how you can verify nothing is uploaded."
+  path="/how-it-works/"
+  h1="How in-browser conversion works"
+  lead="Formatoza sends the converter to your file, instead of sending your file to a converter. Here is what that means in practice."
+>
+  <h2>The usual way: upload, process, download</h2>
+  <p>
+    Most online converters are thin web pages in front of a server. You upload your file, it waits in a queue, a server converts it, and you
+    download the result. That requires trusting the service with your file, and it's slow for large files on ordinary connections.
+  </p>
+  <h2>The Formatoza way: your browser does the work</h2>
+  <p>Every Formatoza page is a static web page. When you open a converter, your browser downloads the code for that converter and runs it locally:</p>
+  <ul>
+    <li><strong>Images</strong> are decoded with your browser's own image decoders and re-encoded with the canvas API. Formats browsers don't support — HEIC, TIFF, ICO bitmaps — are decoded by small libraries or WebAssembly modules that run in the page.</li>
+    <li><strong>PDFs</strong> are rendered with PDF.js, Mozilla's PDF engine, and created with pdf-lib.</li>
+    <li><strong>Data files</strong> (CSV, JSON, XML, YAML, XLSX) are parsed and written in a background Web Worker, so large files don't freeze the page — and cancelling stops the work instantly.</li>
+    <li><strong>Markup, encodings and subtitles</strong> are transformed with purpose-built JavaScript.</li>
+    <li><strong>Word documents</strong> are read with Mammoth, and the resulting HTML is sanitised before you see it.</li>
+  </ul>
+  <p>
+    Heavy components load only when needed. The homepage ships almost no JavaScript; the PDF renderer loads only on PDF tools once you add a PDF; the
+    HEIC decoder loads only if your browser can't decode HEIC itself.
+  </p>
+  <h2>Verify it yourself</h2>
+  <ol>
+    <li>Open a converter and let the page load.</li>
+    <li>Open your browser's developer tools and switch to the <em>Network</em> tab.</li>
+    <li>Convert a file. You'll see the converter code load (once), but no request containing your file.</li>
+    <li>For extra certainty, disconnect from the internet after the first conversion — the tool keeps working offline for the rest of the session.</li>
+  </ol>
+  <h2>Limits of local processing</h2>
+  <p>
+    Your device does the work, so very large files are limited by its memory, and older phones may be slower than a server. Each tool states
+    its file-size limits. Some conversions — PDF to Word with layout fidelity, or large video files — aren't offered because they can't be done
+    reliably in a browser yet. We would rather not offer a tool than offer one that produces poor results.
+  </p>
+  <h2>What still goes over the network</h2>
+  <p>
+    Loading the website itself (pages, code, fonts) and, when active, advertising. Ads are loaded after the page has finished loading and never
+    receive your files or their contents. See the <a href="/privacy/">privacy policy</a> for details.
+  </p>
+</PolicyLayout>

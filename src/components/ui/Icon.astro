@@ -1,0 +1,46 @@
+---
+/** Inline SVG icons (stroke-based, 24px grid). */
+export type IconName =
+  | 'arrow-right' | 'search' | 'lock' | 'menu' | 'x' | 'chevron-right' | 'chevron-down'
+  | 'shield' | 'bolt' | 'user-off' | 'gift' | 'file' | 'book' | 'mail' | 'cpu';
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { name, size = 16, class: className, label } = Astro.props;
+const PATHS: Record<IconName, string> = {
+  'arrow-right': 'M5 12h14M13 6l6 6-6 6',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35',
+  lock: 'M7 11V7a5 5 0 0 1 10 0v4M5 11h14v10H5z',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  x: 'M6 6l12 12M18 6L6 18',
+  'chevron-right': 'M9 6l6 6-6 6',
+  'chevron-down': 'M6 9l6 6 6-6',
+  shield: 'M12 3l8 3v6c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V6l8-3z',
+  bolt: 'M13 2L4 14h7l-1 8 9-12h-7l1-8z',
+  'user-off': 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM17 8l5 5M22 8l-5 5',
+  gift: 'M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z',
+  file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6',
+  book: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5',
+  mail: 'M4 4h16v16H4zM4 6l8 7 8-7',
+  cpu: 'M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3M6 6h12v12H6zM10 10h4v4h-4z',
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  aria-hidden={label ? undefined : 'true'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  focusable="false"><path d={PATHS[name]}></path></svg
+>

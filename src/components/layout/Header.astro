@@ -1,0 +1,87 @@
+---
+import Logo from './Logo.astro';
+import Search from './Search.astro';
+import Icon from '~/components/ui/Icon.astro';
+import { CATEGORY_LIST } from '~/lib/catalog/registry';
+
+interface Props {
+  /** Hide the header search (the homepage has its own). */
+  hideSearch?: boolean;
+}
+const { hideSearch = false } = Astro.props;
+const current = Astro.url.pathname;
+const nav = [...CATEGORY_LIST.map((c) => ({ href: `/${c.path}/`, label: c.navLabel })), { href: '/guides/', label: 'Guides' }];
+---
+
+<header class="sticky top-0 z-40 h-(--header-h) bg-bg/80 shadow-[0_1px_0_0_var(--border)] backdrop-blur-md supports-[not(backdrop-filter:blur(1px))]:bg-bg">
+  <div class="container-page flex h-full items-center gap-6">
+    <Logo />
+    <nav aria-label="Main" class="hidden lg:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((n) => (
+            <li>
+              <a
+                href={n.href}
+                class:list={[
+                  'rounded-md px-3 py-2 text-sm transition-colors hover:bg-hover hover:text-fg',
+                  current.startsWith(n.href) ? 'font-medium text-fg' : 'text-fg-2',
+                ]}
+                aria-current={current.startsWith(n.href) ? 'page' : undefined}
+              >
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="ml-auto hidden w-64 md:block xl:w-72">{!hideSearch && <Search id="header-search" />}</div>
+
+    <details class="group relative ml-auto md:ml-0 lg:hidden" data-mobile-menu>
+      <summary class="btn btn-ghost btn-icon list-none [&::-webkit-details-marker]:hidden" aria-label="Menu">
+        <Icon name="menu" size={20} class="group-open:hidden" />
+        <Icon name="x" size={20} class="hidden group-open:block" />
+      </summary>
+      <div class="animate-enter fixed inset-x-0 top-(--header-h) z-50 max-h-[calc(100dvh-var(--header-h))] overflow-auto bg-bg p-4 shadow-[0_1px_0_0_var(--border)] sm:absolute sm:inset-x-auto sm:top-12 sm:right-0 sm:w-80 sm:rounded-lg sm:bg-surface sm:shadow-menu">
+        {
+          !hideSearch && (
+            <div class="mb-3 md:hidden">
+              <Search id="mobile-search" />
+            </div>
+          )
+        }
+        <nav aria-label="Mobile">
+          <ul class="grid gap-0.5">
+            {
+              nav.map((n) => (
+                <li>
+                  <a href={n.href} class="flex items-center justify-between rounded-md px-3 py-2.5 text-[15px] text-fg hover:bg-hover">
+                    {n.label}
+                    <Icon name="chevron-right" class="text-fg-3" />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </details>
+  </div>
+</header>
+
+<script>
+  // Close the mobile menu on Escape or when clicking outside.
+  const menu = document.querySelector<HTMLDetailsElement>('[data-mobile-menu]');
+  if (menu) {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (menu.open && !menu.contains(e.target as Node)) menu.open = false;
+    });
+  }
+</script>

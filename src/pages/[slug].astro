@@ -1,0 +1,202 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Breadcrumbs from '~/components/layout/Breadcrumbs.astro';
+import ConverterShell from '~/components/converter/ConverterShell.tsx';
+import TrustStrip from '~/components/ui/TrustStrip.astro';
+import FormatCompare from '~/components/ui/FormatCompare.astro';
+import RelatedTools from '~/components/ui/RelatedTools.astro';
+import FAQ from '~/components/ui/FAQ.astro';
+import Icon from '~/components/ui/Icon.astro';
+import AdSlot from '~/components/ads/AdSlot.astro';
+import { CONVERSIONS, CATEGORIES, categoryPath, toClientConversion } from '~/lib/catalog/registry';
+import { getConversion, relatedMetas, renderConversionBody } from '~/lib/catalog/content';
+import { breadcrumbList, faqPage, graph, organization, webApplication, website } from '~/lib/seo/jsonld';
+import { formatBytes } from '~/lib/file/format';
+import { getEntry } from 'astro:content';
+import { SITE } from '~/config/site';
+
+export function getStaticPaths() {
+  return CONVERSIONS.map((c) => ({ params: { slug: c.slug } }));
+}
+
+const { slug } = Astro.params as { slug: string };
+const c = await getConversion(slug);
+const category = CATEGORIES[c.category];
+const { Content, headings } = await renderConversionBody(slug);
+const related = relatedMetas(c);
+const guide = await getEntry('guides', c.guide);
+if (!guide) throw new Error(`[${slug}] guide "${c.guide}" not found`);
+
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: category.name, path: categoryPath(c.category) },
+  { name: c.h1.replace(/ Converter$/, ''), path: c.path },
+];
+const jsonLd = graph(organization(), website(), breadcrumbList(crumbs), webApplication(c), faqPage(c.faq, c.path));
+const toc = [
+  { id: 'about', text: `About this converter` },
+  { id: 'how-to', text: `How to convert ${c.source.name} to ${c.target.name}` },
+  ...headings.filter((h) => h.depth === 2).map((h) => ({ id: h.slug, text: h.text })),
+  { id: 'formats', text: `${c.source.name} vs ${c.target.name}` },
+  { id: 'limits', text: 'Supported files and limits' },
+  { id: 'limitations', text: 'Limitations' },
+  { id: 'use-cases', text: 'When to use it' },
+  { id: 'faq', text: 'FAQ' },
+];
+const reviewed = new Date(SITE.contentReviewed).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const introParas = c.intro.split(/\n\s*\n/);
+---
+
+<BaseLayout meta={{ title: c.title, description: c.metaDescription, path: c.path }} jsonLd={jsonLd} ads>
+  <div class="container-page pt-6 sm:pt-8">
+    <Breadcrumbs items={crumbs} />
+
+    <header class="mt-6 max-w-3xl sm:mt-8">
+      <p class="t-eyebrow"><a href={categoryPath(c.category)} class="hover:text-fg">{category.name}</a> · {c.source.name} → {c.target.name}</p>
+      <h1 class="t-display mt-3">{c.h1}</h1>
+      <p class="mt-4 text-lg leading-relaxed text-fg-2">{c.shortDescription}</p>
+    </header>
+
+    <div class="mt-8">
+      <ConverterShell client:load conversion={toClientConversion(c)} />
+      <noscript>
+        <p class="mt-4 rounded-lg bg-surface p-4 text-sm text-fg-2 shadow-border">
+          This converter runs in your browser and needs JavaScript. Please enable JavaScript to convert files — nothing is uploaded.
+        </p>
+      </noscript>
+    </div>
+
+    <TrustStrip class="mt-4" processing={c.browserProcessing} lazyAssetNote={c.lazyAssetNote} />
+
+    <AdSlot placement="toolAfterConverter" />
+
+    <div class="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-16">
+      <article class="min-w-0">
+        <section aria-labelledby="about" class="prose-fz">
+          <h2 id="about" class="!mt-0">About this {c.source.name} to {c.target.name} converter</h2>
+          {introParas.map((p) => <p>{p}</p>)}
+        </section>
+
+        <section aria-labelledby="how-to" class="mt-12">
+          <h2 id="how-to" class="t-title">How to convert {c.source.name} to {c.target.name}</h2>
+          <ol class="mt-6 grid gap-3">
+            {
+              c.steps.map((s, i) => (
+                <li class="flex gap-4 rounded-lg bg-surface p-4 shadow-border">
+                  <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-fg font-mono text-xs font-medium text-on-fg">{i + 1}</span>
+                  <p class="pt-0.5 text-[15px] leading-relaxed text-fg-2">{s}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+
+        <div class="prose-fz mt-4">
+          <Content />
+        </div>
+
+        <section aria-labelledby="formats" class="mt-14">
+          <h2 id="formats" class="t-title">{c.source.name} vs {c.target.name}</h2>
+          <div class="prose-fz mt-5">
+            <h3 class="!mt-0">What is {c.source.name}?</h3>
+            <p>{c.sourceExplanation}</p>
+            <h3>What is {c.target.name}?</h3>
+            <p>{c.targetExplanation}</p>
+          </div>
+          <div class="mt-6"><FormatCompare source={c.source} target={c.target} /></div>
+        </section>
+
+        <section aria-labelledby="limits" class="mt-14">
+          <h2 id="limits" class="t-title">Supported files and limits</h2>
+          <dl class="mt-6 grid overflow-hidden rounded-lg bg-surface text-sm shadow-border sm:grid-cols-2">
+            {
+              [
+                ['Accepted input', c.input.extensions.join(', ') + (c.input.textInput ? ' — or paste text' : '')],
+                ['Output', `${c.target.name} (${c.output.extension})${c.output.combinesInputs && c.input.multiple ? ', several inputs combined into one file' : ''}`],
+                ['Files per conversion', c.input.multiple ? `Up to ${c.input.maxFiles}` : 'One at a time'],
+                ['Maximum file size', `${formatBytes(c.input.maxFileBytes)} per file`],
+                ['Where it runs', c.browserProcessing.startsWith('local') ? 'In your browser, on your device' : 'Remote'],
+                ['Cost', 'Free, no account, no watermark'],
+              ].map(([k, v]) => (
+                <div class="flex flex-col gap-1 p-4 shadow-[0_0_0_0.5px_var(--border)]">
+                  <dt class="text-[13px] text-fg-3">{k}</dt>
+                  <dd class="font-medium break-words text-fg">{v}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="mt-3 text-[13px] text-fg-3">
+            Limits protect your browser from running out of memory; very large files may still be slow on older phones.
+          </p>
+        </section>
+
+        <section aria-labelledby="limitations" class="mt-14">
+          <h2 id="limitations" class="t-title">Limitations and fidelity</h2>
+          <ul class="mt-6 grid gap-3">
+            {
+              c.limitations.map((l) => (
+                <li class="flex gap-3 text-[15px] leading-relaxed text-fg-2">
+                  <span class="dot mt-2.5 bg-dot-amber" aria-hidden="true" />
+                  <span>{l}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section aria-labelledby="use-cases" class="mt-14">
+          <h2 id="use-cases" class="t-title">When to use it</h2>
+          <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+            {
+              c.useCases.map((u) => (
+                <li class="rounded-lg bg-surface p-5 shadow-border">
+                  <h3 class="text-[15px] font-semibold tracking-[-0.01em] text-fg">{u.title}</h3>
+                  <p class="mt-2 text-sm leading-relaxed text-fg-2">{u.text}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <AdSlot placement="toolInContent" />
+
+        <div class="mt-14"><FAQ items={c.faq} /></div>
+
+        <aside class="mt-14 flex gap-4 rounded-lg bg-surface p-5 text-sm text-fg-2 shadow-border" aria-label="About this page">
+          <Icon name="book" size={18} class="mt-0.5 shrink-0 text-fg" />
+          <p>
+            Written and tested by the {SITE.name} team; last reviewed {reviewed}. Every claim on this page reflects how this converter actually behaves — see our
+            <a class="link" href="/editorial-policy/">editorial policy</a> and <a class="link" href="/how-it-works/">how in-browser conversion works</a>.
+            Spotted a problem? <a class="link" href="/contact/">Tell us</a>.
+          </p>
+        </aside>
+      </article>
+
+      <aside class="hidden lg:block" aria-label="Page navigation">
+        <div class="sticky top-[calc(var(--header-h)+24px)] grid gap-8">
+          <nav aria-labelledby="toc-h">
+            <p id="toc-h" class="t-eyebrow">On this page</p>
+            <ul class="mt-3 grid gap-2 text-[13px]">
+              {toc.map((t) => <li><a href={`#${t.id}`} class="text-fg-2 hover:text-fg">{t.text}</a></li>)}
+            </ul>
+          </nav>
+          <div class="grid gap-2 text-[13px]">
+            <p class="t-eyebrow">Learn more</p>
+            <a href={`/guides/${guide.id}/`} class="group rounded-lg bg-surface p-4 shadow-border hover:shadow-large">
+              <span class="text-fg-3">Guide</span>
+              <span class="mt-1 block font-medium text-fg group-hover:text-accent">{guide.data.h1}</span>
+            </a>
+            <a href={categoryPath(c.category)} class="text-fg-2 hover:text-fg">All {category.name.toLowerCase()} →</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="mt-16 grid gap-6">
+      <RelatedTools tools={related} title={c.reverse ? `Related converters (including ${c.target.name} to ${c.source.name})` : 'Related converters'} />
+      <p class="text-sm text-fg-2 lg:hidden">
+        Learn more: <a class="link" href={`/guides/${guide.id}/`}>{guide.data.h1}</a> · <a class="link" href={categoryPath(c.category)}>All {category.name.toLowerCase()}</a>
+      </p>
+    </div>
+  </div>
+</BaseLayout>
