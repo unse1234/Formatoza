@@ -1,0 +1,122 @@
+{
+  "image": {
+    "path": "image-converters",
+    "name": "Image converters",
+    "navLabel": "Image",
+    "title": "Image Converters — HEIC, WebP, AVIF, PNG, JPG & more | Formatoza",
+    "metaDescription": "Convert HEIC, AVIF, WebP, SVG, GIF, BMP, TIFF and ICO images to JPG, PNG or WebP in your browser. Photos never leave your device. Free, no signup.",
+    "headline": "Image converters that run on your device",
+    "intro": "Most image conversions happen because a file won't open somewhere: an iPhone photo in HEIC that Windows can't preview, a WebP saved from a website that an older editor refuses, an SVG logo a social network won't accept. These tools decode the image in your browser and re-encode it into the format you need, with control over quality and background color where it matters.",
+    "sections": [
+      {
+        "heading": "Which output format should you pick?",
+        "body": "Choose JPG for photos that need to open everywhere — email, print shops, government portals. Choose PNG for screenshots, logos and anything with transparency or sharp text, where exact pixels matter more than file size. Choose WebP when the image is going on a website and you want files smaller than JPEG while keeping transparency."
+      },
+      {
+        "heading": "What happens to quality and metadata",
+        "body": "Converting between lossy formats (HEIC, AVIF, WebP to JPG) re-compresses the picture once, so pick a high quality setting when the image will be edited again. Because conversion redraws pixels, EXIF metadata such as GPS location and camera model is not copied into the new file — useful for privacy, but keep the original if you need that data."
+      }
+    ],
+    "guide": "image-formats-explained"
+  },
+  "pdf": {
+    "path": "pdf-converters",
+    "name": "PDF converters",
+    "navLabel": "PDF",
+    "title": "PDF Converters — Images to PDF & PDF to Images | Formatoza",
+    "metaDescription": "Combine JPG, PNG, WebP or HEIC images into a PDF, or turn PDF pages into JPG, PNG or WebP images. Runs in your browser — files are not uploaded.",
+    "headline": "Move between PDF pages and images",
+    "intro": "PDF is how documents get submitted, printed and archived; images are how they get captured and shared. These tools cover both directions: combine photos of receipts, scans or screenshots into one ordered PDF, or render PDF pages into images you can post, embed in slides or attach where PDFs aren't accepted.",
+    "sections": [
+      {
+        "heading": "Images to PDF",
+        "body": "JPG photos are embedded into the PDF without re-compression, so quality is identical to the original. PNG images keep their lossless pixels. WebP and HEIC are decoded first and stored in a PDF-compatible encoding. You control page size (fit to image, A4 or US Letter), orientation and margins, and you can reorder files before building the document."
+      },
+      {
+        "heading": "PDF to images",
+        "body": "Each page is rendered with PDF.js — the same engine Firefox uses to display PDFs — at the resolution you pick. 150 DPI suits screens, 300 DPI suits print. Text in the output images is pixels, not selectable text; use PDF to Text if you need the words themselves."
+      }
+    ],
+    "guide": "pdf-and-images"
+  },
+  "data": {
+    "path": "data-converters",
+    "name": "Data converters",
+    "navLabel": "Data",
+    "title": "Data Converters — CSV, JSON, XML, YAML, TSV & XLSX | Formatoza",
+    "metaDescription": "Convert between CSV, TSV, JSON, XML, YAML and Excel XLSX in your browser. Paste or drop files, preview the result, download. Nothing is uploaded.",
+    "headline": "Reshape data between CSV, JSON, XML and YAML",
+    "intro": "Data rarely arrives in the shape the next tool wants: an API returns JSON but a colleague needs a spreadsheet, a legacy system exports XML but your script reads CSV, a Kubernetes manifest is YAML but the validator wants JSON. These converters parse your data with well-tested libraries, report malformed rows instead of silently dropping them, and let you paste text or drop whole files.",
+    "sections": [
+      {
+        "heading": "Tables versus trees",
+        "body": "CSV, TSV and XLSX are flat grids. JSON, XML and YAML are trees that can nest without limit. Going from a tree to a table requires flattening (nested keys become dotted column names such as address.city); going from a table to a tree produces an array of records. Each converter page explains exactly how its mapping works and what can't survive the trip."
+      },
+      {
+        "heading": "Types are not guessed carelessly",
+        "body": "CSV has no data types, so converters only turn a value into a number when doing so is lossless — 42 becomes a number, but a ZIP code like 02134 or a phone number like +4930… stays text. Booleans are recognised only when written as true or false."
+      }
+    ],
+    "guide": "data-formats-compared"
+  },
+  "developer": {
+    "path": "developer-converters",
+    "name": "Developer converters",
+    "navLabel": "Developer",
+    "title": "Developer Tools — Markdown, HTML, Base64 & URL Encoding | Formatoza",
+    "metaDescription": "Convert Markdown to HTML and back, strip HTML to plain text, encode or decode Base64 and URL strings. Instant, private, in your browser.",
+    "headline": "Markup and encoding tools for everyday development",
+    "intro": "Small conversions interrupt real work all the time: turning a README into HTML for a CMS, cleaning pasted HTML down to Markdown, decoding a Base64 blob from a log, or fixing a query string that someone encoded twice. These tools accept pasted text or files, convert as you go, and show exactly what changed.",
+    "sections": [
+      {
+        "heading": "Markup",
+        "body": "Markdown to HTML uses a CommonMark-compatible parser with GitHub Flavored Markdown tables and task lists. HTML to Markdown and HTML to Text walk the document tree, dropping scripts, styles and layout wrappers while keeping headings, lists, links and tables."
+      },
+      {
+        "heading": "Encodings are not encryption",
+        "body": "Base64 and percent-encoding make data safe to transport, not secret. Anyone can decode them, so never treat an encoded value as protected. Everything you paste here is processed in your browser and never sent anywhere."
+      }
+    ],
+    "guide": "base64-and-url-encoding"
+  },
+  "subtitle": {
+    "path": "subtitle-converters",
+    "name": "Subtitle converters",
+    "navLabel": "Subtitles",
+    "title": "Subtitle Converters — SRT, VTT, ASS & TXT | Formatoza",
+    "metaDescription": "Convert subtitles between SRT, WebVTT and ASS, or extract the text as a transcript. Fixes encodings and timestamps. Runs in your browser.",
+    "headline": "Subtitle and caption conversions",
+    "intro": "Every platform wants captions in its own format: HTML5 video needs WebVTT, most editors and upload forms expect SRT, and styled anime or karaoke subtitles live in ASS. These converters parse cues carefully — tolerating missing counters, Windows line endings and legacy text encodings — and tell you which formatting could not be carried over.",
+    "sections": [
+      {
+        "heading": "What changes between formats",
+        "body": "The differences are mostly timestamps and styling. SRT writes 00:01:02,500, WebVTT writes 00:01:02.500, and ASS writes 0:01:02.50 with only centisecond precision. Positioning, voice tags and style definitions exist in some formats but not others, so each page lists exactly what is kept and what is dropped."
+      },
+      {
+        "heading": "Text encodings",
+        "body": "Older subtitle files are often saved in Windows-1252 or another legacy encoding rather than UTF-8, which shows up as Ã© instead of é. Files are decoded as UTF-8 when valid and otherwise as Windows-1252, and every output is written as UTF-8."
+      }
+    ],
+    "guide": "subtitle-formats-explained"
+  },
+  "document": {
+    "path": "document-converters",
+    "name": "Document converters",
+    "navLabel": "Documents",
+    "title": "Document Converters — DOCX to HTML/TXT & PDF to Text | Formatoza",
+    "metaDescription": "Extract clean HTML or plain text from Word DOCX files and pull the text out of PDFs, right in your browser. Honest about what layout is kept.",
+    "headline": "Get the content out of Word and PDF files",
+    "intro": "Documents are often needed as content rather than layout: a Word file that must become a web page, a contract whose text needs to go into another system, a PDF report you want to search or quote. These tools extract structure and text reliably. They deliberately do not promise pixel-perfect layout conversion, which cannot be done well in a browser.",
+    "sections": [
+      {
+        "heading": "Structure, not appearance",
+        "body": "DOCX conversion maps Word's paragraph styles to semantic HTML — Heading 1 becomes <h1>, lists become <ul>/<ol>, tables become <table> — and ignores fonts, colors and page layout. The result is clean markup that is easy to paste into a CMS."
+      },
+      {
+        "heading": "Scanned documents",
+        "body": "PDF to Text reads the text layer inside the PDF. Scanned documents are usually just images of pages with no text layer; those need OCR, which these tools do not perform."
+      }
+    ],
+    "guide": "docx-and-pdf-text"
+  }
+}

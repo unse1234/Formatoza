@@ -1,0 +1,30 @@
+---
+import { resolveMeta, type PageMeta } from '~/lib/seo/meta';
+import { SITE } from '~/config/site';
+interface Props {
+  meta: PageMeta;
+}
+const m = resolveMeta(Astro.props.meta);
+---
+
+<title>{m.title}</title>
+<meta name="description" content={m.description} />
+<link rel="canonical" href={m.canonical} />
+<meta name="robots" content={m.robots} />
+<meta property="og:type" content={m.og.type} />
+<meta property="og:site_name" content={m.og.siteName} />
+<meta property="og:locale" content={m.og.locale} />
+<meta property="og:title" content={m.og.title} />
+<meta property="og:description" content={m.og.description} />
+<meta property="og:url" content={m.og.url} />
+<meta property="og:image" content={m.og.image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={m.og.imageAlt} />
+{m.publishedTime && <meta property="article:published_time" content={m.publishedTime} />}
+{m.modifiedTime && <meta property="article:modified_time" content={m.modifiedTime} />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={m.og.title} />
+<meta name="twitter:description" content={m.og.description} />
+<meta name="twitter:image" content={m.og.image} />
+<meta name="application-name" content={SITE.name} />

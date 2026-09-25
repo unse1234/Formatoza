@@ -1,0 +1,218 @@
+---
+/**
+ * Tool search: an accessible combobox. The index (/search-index.json, ~8 KB)
+ * is fetched on first focus, so it costs nothing on page load.
+ */
+import Icon from '~/components/ui/Icon.astro';
+interface Props {
+  variant?: 'header' | 'hero';
+  id: string;
+}
+const { variant = 'header', id } = Astro.props;
+const hero = variant === 'hero';
+---
+
+<div class:list={['fz-search relative w-full', hero ? 'max-w-xl' : 'max-w-xs']} data-search>
+  <label for={`${id}-input`} class="sr-only">
+    Search converters
+  </label>
+  <div class="relative">
+    <Icon
+      name="search"
+      size={hero ? 18 : 15}
+      class={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-fg-3 ${hero ? 'left-4' : 'left-3'}`}
+    />
+    <input
+      id={`${id}-input`}
+      type="search"
+      role="combobox"
+      aria-expanded="false"
+      aria-controls={`${id}-list`}
+      aria-autocomplete="list"
+      autocomplete="off"
+      spellcheck="false"
+      placeholder={
+        hero ? 'Search 60+ converters — try “heic”, “csv json” or “subtitles”' : 'Search converters'
+      }
+      class:list={[
+        'field',
+        hero
+          ? '!h-12 !rounded-lg !pl-11 !pr-4 !text-base shadow-small'
+          : '!h-9 !pl-9 !pr-9 !text-sm',
+      ]}
+      data-search-input
+    />
+    {!hero && (
+      <kbd
+        class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded px-1.5 font-mono text-[11px] text-fg-3 shadow-border md:block"
+        aria-hidden="true"
+      >
+        /
+      </kbd>
+    )}
+  </div>
+  <ul
+    id={`${id}-list`}
+    role="listbox"
+    aria-label="Matching converters"
+    class="animate-fade absolute top-full right-0 left-0 z-50 mt-2 hidden max-h-[min(24rem,70vh)] overflow-auto rounded-lg bg-surface p-1 shadow-menu"
+    data-search-list
+  ></ul>
+</div>
+
+<script>
+  interface Entry {
+    p: string;
+    t: string;
+    d: string;
+    c: string;
+    k: string;
+  }
+  let indexPromise: Promise<Entry[]> | undefined;
+  const loadIndex = () =>
+    (indexPromise ??= fetch('/search-index.json')
+      .then((r) => (r.ok ? (r.json() as Promise<Entry[]>) : []))
+      .catch(() => {
+        indexPromise = undefined;
+        return [];
+      }));
+
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/jpeg/g, 'jpg')
+      .replace(/\btif\b/g, 'tiff')
+      .replace(/\byml\b/g, 'yaml')
+      .replace(/\bmd\b/g, 'markdown')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+
+  function score(e: Entry, q: string, tokens: string[]): number {
+    const title = norm(e.t);
+    const hay = `${title} ${norm(e.k)} ${norm(e.c)}`;
+    if (!tokens.every((t) => hay.includes(t))) return 0;
+    let s = 1;
+    if (title.startsWith(q)) s += 10;
+    if (title.includes(q)) s += 5;
+    // Prefer order-matching "x to y" queries.
+    if (tokens.length >= 2 && title.indexOf(tokens[0]!) < title.indexOf(tokens[tokens.length - 1]!))
+      s += 3;
+    tokens.forEach((t) => title.split(' ').includes(t) && (s += 2));
+    return s;
+  }
+
+  function setup(root: HTMLElement) {
+    const input = root.querySelector<HTMLInputElement>('[data-search-input]')!;
+    const list = root.querySelector<HTMLUListElement>('[data-search-list]')!;
+    let results: Entry[] = [];
+    let active = -1;
+
+    const close = () => {
+      list.classList.add('hidden');
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+      active = -1;
+    };
+    const setActive = (i: number) => {
+      const items = list.querySelectorAll<HTMLElement>('[role=option]');
+      items.forEach((el, j) => el.setAttribute('aria-selected', String(j === i)));
+      active = i;
+      if (i >= 0 && items[i]) {
+        input.setAttribute('aria-activedescendant', items[i].id);
+        items[i].scrollIntoView({ block: 'nearest' });
+      } else input.removeAttribute('aria-activedescendant');
+    };
+    const render = () => {
+      list.replaceChildren();
+      const q = norm(input.value)
+        .replace(/\bto\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (!q) return close();
+      loadIndex().then((index) => {
+        const tokens = q.split(' ').filter(Boolean);
+        results = index
+          .map((e) => ({ e, s: score(e, q, tokens) }))
+          .filter((x) => x.s > 0)
+          .sort((a, b) => b.s - a.s)
+          .slice(0, 8)
+          .map((x) => x.e);
+        list.replaceChildren();
+        if (!results.length) {
+          const li = document.createElement('li');
+          li.className = 'px-3 py-2.5 text-sm text-fg-3';
+          li.textContent = 'No converter matches yet — try a format name like “png” or “srt”.';
+          li.setAttribute('role', 'presentation');
+          list.append(li);
+        }
+        results.forEach((r, i) => {
+          const li = document.createElement('li');
+          li.id = `${list.id}-${i}`;
+          li.setAttribute('role', 'option');
+          li.setAttribute('aria-selected', 'false');
+          li.className =
+            'group cursor-pointer rounded-md px-3 py-2 aria-selected:bg-hover hover:bg-hover';
+          const a = document.createElement('a');
+          a.href = r.p;
+          a.tabIndex = -1;
+          a.className = 'flex flex-col gap-0.5';
+          const t = document.createElement('span');
+          t.className = 'text-sm font-medium text-fg';
+          t.textContent = r.t;
+          const d = document.createElement('span');
+          d.className = 'truncate text-xs text-fg-3';
+          d.textContent = `${r.c} · ${r.d}`;
+          a.append(t, d);
+          li.append(a);
+          li.addEventListener('mousedown', (ev) => ev.preventDefault());
+          li.addEventListener('click', () => (location.href = r.p));
+          list.append(li);
+        });
+        list.classList.remove('hidden');
+        input.setAttribute('aria-expanded', 'true');
+        setActive(results.length ? 0 : -1);
+      });
+    };
+
+    input.addEventListener('focus', () => void loadIndex(), { once: true });
+    input.addEventListener('input', render);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' && results.length) {
+        e.preventDefault();
+        if (list.classList.contains('hidden')) render();
+        setActive((active + 1) % results.length);
+      } else if (e.key === 'ArrowUp' && results.length) {
+        e.preventDefault();
+        setActive((active - 1 + results.length) % results.length);
+      } else if (e.key === 'Enter') {
+        const target = results[active] ?? results[0];
+        if (target) {
+          e.preventDefault();
+          location.href = target.p;
+        }
+      } else if (e.key === 'Escape') {
+        if (!list.classList.contains('hidden')) {
+          e.preventDefault();
+          close();
+        } else input.blur();
+      }
+    });
+    input.addEventListener('blur', () => setTimeout(close, 120));
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-search]').forEach(setup);
+
+  // "/" focuses the first visible search box (unless typing somewhere).
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    const input = [...document.querySelectorAll<HTMLInputElement>('[data-search-input]')].find(
+      (i) => i.offsetParent !== null,
+    );
+    if (input) {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+</script>

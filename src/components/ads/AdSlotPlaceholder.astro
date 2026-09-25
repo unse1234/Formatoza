@@ -1,0 +1,13 @@
+---
+/** Visual stand-in used during design review (PUBLIC_AD_PLACEHOLDERS=true). Never shipped with real ads. */
+interface Props {
+  placement: string;
+}
+---
+
+<div
+  class="flex min-h-[250px] items-center justify-center rounded-lg text-xs text-fg-3 [background:repeating-linear-gradient(135deg,transparent_0_10px,var(--surface-2)_10px_20px)] shadow-border"
+  data-ad-placeholder={Astro.props.placement}
+>
+  Ad placement · {Astro.props.placement}
+</div>

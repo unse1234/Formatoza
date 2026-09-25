@@ -1,0 +1,15 @@
+{
+  "name": "Formatoza — File converters that run in your browser",
+  "short_name": "Formatoza",
+  "description": "Free, private file converters. Files are processed on your device and never uploaded.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#fafafa",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

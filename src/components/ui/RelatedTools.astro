@@ -1,0 +1,25 @@
+---
+import ToolCard from './ToolCard.astro';
+import type { ConversionMeta } from '~/lib/catalog/types';
+interface Props {
+  tools: ConversionMeta[];
+  title?: string;
+  id?: string;
+}
+const { tools, title = 'Related converters', id = 'related' } = Astro.props;
+---
+
+{tools.length > 0 && (
+  <section aria-labelledby={id}>
+    <h2 id={id} class="t-subtitle">
+      {title}
+    </h2>
+    <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {tools.map((t) => (
+        <li>
+          <ToolCard tool={t} compact />
+        </li>
+      ))}
+    </ul>
+  </section>
+)}

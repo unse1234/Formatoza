@@ -1,0 +1,3 @@
+id,name,tags,address.city,address.zip,active,note
+1,Ana Souza,"[""admin"",""editor""]",São Paulo,01310-100,true,
+2,Lee Min-jun 👋,[],서울,04524,false,

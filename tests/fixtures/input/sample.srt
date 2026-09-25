@@ -1,0 +1,12 @@
+1
+00:00:01,000 --> 00:00:03,500
+<i>Previously…</i> Ünïcödé 👋
+
+2
+00:00:04,000 --> 00:00:06,250
+{\an8}We need to talk.
+- About what?
+
+3
+00:00:09,100 --> 00:00:11,000
+<font color="#ff0">You know</font> exactly what & why.

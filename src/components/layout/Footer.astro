@@ -1,0 +1,134 @@
+---
+import Logo from './Logo.astro';
+import { CATEGORY_LIST, getConversionMeta } from '~/lib/catalog/registry';
+import { SITE } from '~/config/site';
+import { ADS } from '~/config/ads';
+
+const popular = [
+  'heic-to-jpg',
+  'webp-to-png',
+  'webp-to-jpg',
+  'jpg-to-pdf',
+  'pdf-to-png',
+  'png-to-jpg',
+  'csv-to-json',
+  'json-to-csv',
+  'avif-to-jpg',
+  'srt-to-vtt',
+].map(getConversionMeta);
+const company = [
+  { href: '/about/', label: 'About' },
+  { href: '/how-it-works/', label: 'How it works' },
+  { href: '/editorial-policy/', label: 'Editorial policy' },
+  { href: '/contact/', label: 'Contact' },
+];
+const legal = [
+  { href: '/privacy/', label: 'Privacy policy' },
+  { href: '/cookies/', label: 'Cookie policy' },
+  { href: '/terms/', label: 'Terms of service' },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 shadow-[0_-1px_0_0_var(--border)]">
+  <div class="container-page grid gap-10 py-12 md:grid-cols-[1.2fr_repeat(4,1fr)]">
+    <div class="max-w-xs">
+      <Logo />
+      <p class="mt-4 text-sm text-fg-2">
+        {SITE.tagline}. Supported files are processed by your browser and never uploaded to our
+        servers.
+      </p>
+    </div>
+    <nav aria-labelledby="ft-cat">
+      <h2 id="ft-cat" class="text-sm font-medium text-fg">
+        Converters
+      </h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {CATEGORY_LIST.map((c) => (
+          <li>
+            <a class="text-fg-2 hover:text-fg" href={`/${c.path}/`}>
+              {c.name}
+            </a>
+          </li>
+        ))}
+        <li>
+          <a class="text-fg-2 hover:text-fg" href="/guides/">
+            Guides
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <nav aria-labelledby="ft-pop">
+      <h2 id="ft-pop" class="text-sm font-medium text-fg">
+        Popular
+      </h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {popular.map((c) => (
+          <li>
+            <a class="text-fg-2 hover:text-fg" href={c.path}>
+              {c.h1.replace(/ Converter$/, '')}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-labelledby="ft-co">
+      <h2 id="ft-co" class="text-sm font-medium text-fg">
+        Formatoza
+      </h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {company.map((l) => (
+          <li>
+            <a class="text-fg-2 hover:text-fg" href={l.href}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-labelledby="ft-legal">
+      <h2 id="ft-legal" class="text-sm font-medium text-fg">
+        Legal
+      </h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {legal.map((l) => (
+          <li>
+            <a class="text-fg-2 hover:text-fg" href={l.href}>
+              {l.label}
+            </a>
+          </li>
+        ))}
+        {ADS.enabled && (
+          <li>
+            <button type="button" class="text-left text-fg-2 hover:text-fg" data-privacy-choices>
+              Privacy choices
+            </button>
+          </li>
+        )}
+      </ul>
+    </nav>
+  </div>
+  <div class="container-page flex flex-col gap-2 py-6 text-xs text-fg-3 shadow-[0_-1px_0_0_var(--border)] sm:flex-row sm:justify-between">
+    <p>
+      © {year} {SITE.name}. Free to use. No account needed.
+    </p>
+    <p>
+      <a class="hover:text-fg" href={`mailto:${SITE.contactEmail}`}>
+        {SITE.contactEmail}
+      </a>
+    </p>
+  </div>
+</footer>
+
+{ADS.enabled && <script>
+  document.querySelector('[data-privacy-choices]')?.addEventListener('click', () => {
+    const fc = (
+      window as unknown as {
+        googlefc?: { callbackQueue?: unknown[]; showRevocationMessage?: () => void };
+      }
+    ).googlefc;
+    if (fc?.showRevocationMessage) fc.showRevocationMessage();
+    else if (fc?.callbackQueue) fc.callbackQueue.push(() => fc.showRevocationMessage?.());
+    else location.href = '/cookies/';
+  });
+</script>}

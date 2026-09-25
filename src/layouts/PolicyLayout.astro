@@ -1,0 +1,36 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '~/components/layout/Breadcrumbs.astro';
+import { breadcrumbList, graph, organization, website } from '~/lib/seo/jsonld';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  h1: string;
+  lead?: string;
+  updated?: string;
+}
+const { title, description, path, h1, lead, updated } = Astro.props;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: h1, path },
+];
+---
+
+<BaseLayout
+  meta={{ title, description, path }}
+  jsonLd={graph(organization(), website(), breadcrumbList(crumbs))}
+>
+  <div class="container-page max-w-3xl pt-6 sm:pt-8">
+    <Breadcrumbs items={crumbs} />
+    <header class="mt-8">
+      <h1 class="t-display">{h1}</h1>
+      {lead && <p class="mt-5 text-lg leading-relaxed text-fg-2">{lead}</p>}
+      {updated && <p class="mt-4 text-[13px] text-fg-3">Last updated: {updated}</p>}
+    </header>
+    <div class="prose-fz mt-10">
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

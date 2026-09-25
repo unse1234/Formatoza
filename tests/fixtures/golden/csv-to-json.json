@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Ana Souza",
+    "email": "ana@example.com",
+    "city": "São Paulo",
+    "zip": "01310-100",
+    "active": true,
+    "score": 9.5
+  },
+  {
+    "id": 2,
+    "name": "Lee, Min-jun",
+    "email": "minjun@example.com",
+    "city": "서울",
+    "zip": "04524",
+    "active": false,
+    "score": 10
+  },
+  {
+    "id": 3,
+    "name": "Zoë \"Z\" Müller",
+    "email": "zoe@example.com",
+    "city": "Berlin",
+    "zip": 10115,
+    "active": true,
+    "score": "1.50"
+  }
+]

@@ -1,0 +1,16 @@
+Release notes
+
+Version 2.4 adds offline mode & fixes bugs. Ünïcödé 👋.
+
+Highlights
+
+- Works offline
+- [x] Faster start-up
+  1. nested
+
+Platform	Status
+Web	✅
+
+console.log('hi');
+
+See the blog.

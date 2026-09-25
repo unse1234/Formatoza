@@ -1,0 +1,43 @@
+---
+import PolicyLayout from '~/layouts/PolicyLayout.astro';
+import { SITE } from '~/config/site';
+---
+
+<PolicyLayout
+  title="Contact Formatoza"
+  description="Contact the Formatoza team about bugs, conversion problems, privacy questions, advertising or suggestions for new converters."
+  path="/contact/"
+  h1="Contact us"
+  lead="We read every message. Email is the best way to reach us."
+>
+  <p class="!text-lg">
+    <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+  </p>
+  <h2>Reporting a conversion problem</h2>
+  <p>To help us reproduce it, please include:</p>
+  <ul>
+    <li>
+      the converter's address (for example <code>/heic-to-jpg/</code>);
+    </li>
+    <li>your browser and version, and your device or operating system;</li>
+    <li>what you expected and what happened, including any message the tool showed;</li>
+    <li>
+      if possible, a small sample file that shows the problem — only if it contains nothing private.
+    </li>
+  </ul>
+  <p>
+    Because conversions run in your browser, we never see your files. Please don't send us sensitive
+    documents; a description or a harmless sample is enough.
+  </p>
+  <h2>Suggesting a converter</h2>
+  <p>
+    Tell us which formats you need to convert and what you'll use the result for. Requests help us
+    decide what to build next.
+  </p>
+  <h2>Privacy requests</h2>
+  <p>
+    For questions about personal data or to exercise your rights, email us with “Privacy” in the
+    subject line. See the
+    <a href="/privacy/">privacy policy</a> for details.
+  </p>
+</PolicyLayout>

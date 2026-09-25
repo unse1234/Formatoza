@@ -1,0 +1,53 @@
+---
+/**
+ * Processing & privacy facts. Only claims that are true for the tool:
+ * the "on your device" line is shown only for tools that run locally.
+ */
+import Icon from './Icon.astro';
+import type { BrowserProcessingStatus } from '~/lib/catalog/types';
+interface Props {
+  processing: BrowserProcessingStatus;
+  lazyAssetNote?: string | undefined;
+  class?: string;
+}
+const { processing, lazyAssetNote, class: className } = Astro.props;
+const local = processing === 'local' || processing === 'local-lazy-assets';
+const items = [
+  ...(local
+    ? [
+        {
+          icon: 'shield' as const,
+          title: 'Stays on your device',
+          text: 'Files are processed by your browser and never uploaded.',
+        },
+      ]
+    : []),
+  { icon: 'user-off' as const, title: 'No account', text: 'No sign-up, no email, no watermark.' },
+  {
+    icon: 'bolt' as const,
+    title: 'Fast',
+    text: 'No upload or queue — conversion starts instantly.',
+  },
+  { icon: 'gift' as const, title: 'Free', text: 'Every tool is free to use, supported by ads.' },
+];
+---
+
+<div class:list={['rounded-lg bg-surface shadow-border', className]}>
+  <ul class="grid divide-y divide-[var(--border)] sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+    {items.map((i) => (
+      <li class="flex gap-3 p-4">
+        <Icon name={i.icon} size={18} class="mt-0.5 shrink-0 text-fg" />
+        <div>
+          <p class="text-sm font-medium text-fg">{i.title}</p>
+          <p class="mt-0.5 text-[13px] leading-snug text-fg-3">{i.text}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+  {lazyAssetNote && (
+    <p class="flex gap-2 px-4 py-3 text-[13px] text-fg-3 shadow-[0_-1px_0_0_var(--border)]">
+      <span class="dot mt-1.5 bg-dot-blue" aria-hidden="true" />
+      {lazyAssetNote}
+    </p>
+  )}
+</div>

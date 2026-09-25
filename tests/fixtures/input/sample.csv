@@ -1,0 +1,4 @@
+id,name,email,city,zip,active,score
+1,Ana Souza,ana@example.com,São Paulo,01310-100,true,9.5
+2,"Lee, Min-jun",minjun@example.com,서울,04524,false,10
+3,"Zoë ""Z"" Müller",zoe@example.com,Berlin,10115,true,1.50

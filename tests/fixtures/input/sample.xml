@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- catalog fixture -->
+<catalog xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <book id="bk101" lang="en">
+    <dc:title>XML Developer's Guide</dc:title>
+    <price currency="USD">44.95</price>
+    <tag>xml</tag>
+    <tag>dev</tag>
+  </book>
+  <book id="bk102" lang="fr">
+    <dc:title>Le Petit Prince &amp; moi</dc:title>
+    <price currency="EUR">9.50</price>
+    <tag>fiction</tag>
+  </book>
+</catalog>

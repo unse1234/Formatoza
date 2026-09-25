@@ -1,0 +1,74 @@
+---
+import '~/styles/global.css';
+import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import Seo from '~/components/seo/Seo.astro';
+import JsonLd from '~/components/seo/JsonLd.astro';
+import Header from '~/components/layout/Header.astro';
+import Footer from '~/components/layout/Footer.astro';
+import { SITE } from '~/config/site';
+import { ADS } from '~/config/ads';
+import { consentDefaultsScript } from '~/lib/consent/consent';
+import type { PageMeta } from '~/lib/seo/meta';
+
+interface Props {
+  meta: PageMeta;
+  /** Serialised JSON-LD graph. */
+  jsonLd?: string;
+  /** Load the ad script on this page (only if ads are configured). Default false. */
+  ads?: boolean;
+  hideHeaderSearch?: boolean;
+}
+const { meta, jsonLd, ads = false, hideHeaderSearch = false } = Astro.props;
+const loadAds = ads && ADS.enabled;
+// Loads AdSense after the page is idle (or on first interaction) so it never
+// competes with the converter for bandwidth or main-thread time.
+const adLoader = `(function(){var c=${JSON.stringify(ADS.client)};var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client='+encodeURIComponent(c);document.head.appendChild(s);window.adsbygoogle=window.adsbygoogle||[];document.querySelectorAll('ins.adsbygoogle').forEach(function(){try{window.adsbygoogle.push({});}catch(e){}});}function later(){if('requestIdleCallback' in window){requestIdleCallback(load,{timeout:3000});}else{setTimeout(load,1500);}}if(document.readyState==='complete'){later();}else{addEventListener('load',later,{once:true});}['pointerdown','keydown','scroll'].forEach(function(e){addEventListener(e,load,{once:true,passive:true});});})();`;
+const cfBeacon = (import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '').trim();
+---
+
+<!doctype html>
+<html lang={SITE.lang} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <Seo meta={meta} />
+    <link rel="preload" href={geistLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta
+      name="theme-color"
+      content={SITE.themeColor.light}
+      media="(prefers-color-scheme: light)"
+    />
+    <meta name="theme-color" content={SITE.themeColor.dark} media="(prefers-color-scheme: dark)" />
+    <meta name="format-detection" content="telephone=no" />
+    {ADS.enabled && <meta name="google-adsense-account" content={ADS.client} />}
+    {jsonLd && <JsonLd json={jsonLd} />}
+    {loadAds && (
+      <>
+        <script is:inline set:html={consentDefaultsScript()} />
+        <script is:inline set:html={adLoader} />
+      </>
+    )}
+    {cfBeacon && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: cfBeacon, spa: false })}
+      />
+    )}
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a href="#main" class="sr-only-focusable fixed top-2 left-2 z-[100] btn btn-primary btn-sm">
+      Skip to content
+    </a>
+    <Header hideSearch={hideHeaderSearch} />
+    <main id="main" class="flex-1" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
