@@ -1,8 +1,11 @@
 /**
  * PDF.js loader and page access (browser only). Loaded lazily, only by PDF → X tools.
+ * Uses the "legacy" build: PDF.js 6 relies on very new JS built-ins
+ * (e.g. Map.prototype.getOrInsertComputed) that the legacy build polyfills,
+ * so PDFs also work in browsers that are a year or two old.
  */
-import * as pdfjs from 'pdfjs-dist';
-import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
+import workerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.mjs?url';
 import { ConversionError } from '../types';
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
@@ -25,15 +28,26 @@ export async function openPdf(data: ArrayBuffer): Promise<pdfjs.PDFDocumentProxy
   } catch (err) {
     const name = (err as { name?: string })?.name ?? '';
     if (name === 'PasswordException')
-      throw new ConversionError('ENCRYPTED', 'This PDF is password-protected. Open it in a PDF reader, remove the password (or print to a new PDF), then try again.');
-    if (name === 'InvalidPDFException') throw new ConversionError('MALFORMED_INPUT', 'This file is not a valid PDF or is damaged.');
-    throw new ConversionError('MALFORMED_INPUT', `The PDF could not be opened: ${err instanceof Error ? err.message : String(err)}`);
+      throw new ConversionError(
+        'ENCRYPTED',
+        'This PDF is password-protected. Open it in a PDF reader, remove the password (or print to a new PDF), then try again.',
+      );
+    if (name === 'InvalidPDFException')
+      throw new ConversionError('MALFORMED_INPUT', 'This file is not a valid PDF or is damaged.');
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      `The PDF could not be opened: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }
 
 export type PdfPage = pdfjs.PDFPageProxy;
 
-export async function renderPage(page: PdfPage, scale: number, signal?: AbortSignal): Promise<HTMLCanvasElement> {
+export async function renderPage(
+  page: PdfPage,
+  scale: number,
+  signal?: AbortSignal,
+): Promise<HTMLCanvasElement> {
   const viewport = page.getViewport({ scale });
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.floor(viewport.width));

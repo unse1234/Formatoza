@@ -8,9 +8,19 @@ export const GET: APIRoute = () =>
       CONVERSIONS.map((c) => ({
         p: c.path,
         t: c.h1,
-        d: c.shortDescription.length > 90 ? `${c.shortDescription.slice(0, 88)}…` : c.shortDescription,
+        d:
+          c.shortDescription.length > 90
+            ? `${c.shortDescription.slice(0, 88)}…`
+            : c.shortDescription,
         c: CATEGORIES[c.category].navLabel,
-        k: [c.primaryKeyword, ...c.secondaryKeywords, c.source.name, c.target.name, c.source.fullName, ...c.source.extensions].join(' '),
+        k: [
+          c.primaryKeyword,
+          ...c.secondaryKeywords,
+          c.source.name,
+          c.target.name,
+          c.source.fullName,
+          ...c.source.extensions,
+        ].join(' '),
       })),
     ),
     { headers: { 'Content-Type': 'application/json; charset=utf-8' } },

@@ -8,9 +8,26 @@ interface Props {
 const { from, to, size = 'sm' } = Astro.props;
 ---
 
-<span class:list={['inline-flex items-center gap-1.5 font-mono font-medium', size === 'md' ? 'text-sm' : 'text-xs']}>
+<span
+  class:list={[
+    'inline-flex items-center gap-1.5 font-mono font-medium',
+    size === 'md' ? 'text-sm' : 'text-xs',
+  ]}
+>
   <span class="fmt">{from}</span>
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" class="text-fg-3"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    aria-hidden="true"
+    class="text-fg-3"
+  >
+    <path d="M5 12h14M13 6l6 6-6 6"></path>
+  </svg>
   <span class="sr-only">to</span>
   <span class="fmt">{to}</span>
 </span>

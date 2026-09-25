@@ -8,12 +8,16 @@ export interface MarkdownToHtmlOptions {
 }
 
 function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 export function markdownToHtml(md: string, o: MarkdownToHtmlOptions): string {
   const marked = new Marked({ gfm: o.gfm, breaks: o.breaks, async: false });
-  const body = (marked.parse(md.replace(/^﻿/, '')) as string).trim();
+  const body = (marked.parse(md.replace(/^\ufeff/, '')) as string).trim();
   if (!o.fullDocument) return `${body}\n`;
   const title = firstHeading(md) ?? 'Document';
   return `<!doctype html>
@@ -43,7 +47,7 @@ function firstHeading(md: string): string | undefined {
 
 /** Markdown → plain text by walking the marked token tree. */
 export function markdownToText(md: string, o: { keepLinks: boolean }): string {
-  const tokens = new Marked({ gfm: true }).lexer(md.replace(/^﻿/, ''));
+  const tokens = new Marked({ gfm: true }).lexer(md.replace(/^\ufeff/, ''));
 
   const inline = (ts: Token[] | undefined): string =>
     (ts ?? [])
@@ -52,7 +56,9 @@ export function markdownToText(md: string, o: { keepLinks: boolean }): string {
           case 'link': {
             const l = t as Tokens.Link;
             const text = inline(l.tokens);
-            return o.keepLinks && l.href && l.href !== text && !l.href.startsWith('#') ? `${text} (${l.href})` : text;
+            return o.keepLinks && l.href && l.href !== text && !l.href.startsWith('#')
+              ? `${text} (${l.href})`
+              : text;
           }
           case 'image':
             return (t as Tokens.Image).text;
@@ -98,11 +104,20 @@ export function markdownToText(md: string, o: { keepLinks: boolean }): string {
           const items = l.items.map((item, i) => {
             const marker = item.task ? (item.checked ? '[x] ' : '[ ] ') : '';
             const bullet = l.ordered ? `${start + i}. ` : '- ';
-            const inner = block(item.tokens.filter((x) => x.type !== 'checkbox'), depth + 1).join('\n');
+            const inner = block(
+              item.tokens.filter((x) => x.type !== 'checkbox'),
+              depth + 1,
+            ).join('\n');
             const indent = '  '.repeat(depth);
             return inner
               .split('\n')
-              .map((line, j) => (j === 0 ? `${indent}${bullet}${marker}${line.trimStart()}` : line.startsWith(indent) ? line : `${indent}  ${line}`))
+              .map((line, j) =>
+                j === 0
+                  ? `${indent}${bullet}${marker}${line.trimStart()}`
+                  : line.startsWith(indent)
+                    ? line
+                    : `${indent}  ${line}`,
+              )
               .join('\n');
           });
           out.push(items.join('\n'));
@@ -110,7 +125,10 @@ export function markdownToText(md: string, o: { keepLinks: boolean }): string {
         }
         case 'table': {
           const tb = t as Tokens.Table;
-          const rows = [tb.header.map((c) => inline(c.tokens)), ...tb.rows.map((r) => r.map((c) => inline(c.tokens)))];
+          const rows = [
+            tb.header.map((c) => inline(c.tokens)),
+            ...tb.rows.map((r) => r.map((c) => inline(c.tokens))),
+          ];
           out.push(rows.map((r) => r.join('\t')).join('\n'));
           break;
         }
@@ -135,5 +153,8 @@ export function markdownToText(md: string, o: { keepLinks: boolean }): string {
   };
 
   const text = block(tokens).join('\n\n');
-  return `${decodeHtmlEntities(text).replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim()}\n`;
+  return `${decodeHtmlEntities(text)
+    .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()}\n`;
 }

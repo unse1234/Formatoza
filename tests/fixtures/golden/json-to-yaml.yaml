@@ -1,0 +1,8 @@
+z: 'yes'
+a: '08'
+'n': '1.0'
+t: 'true'
+s: plain
+list:
+  - 1
+  - 'no'

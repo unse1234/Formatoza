@@ -16,8 +16,23 @@ export function itemsToText(items: TextItemLike[]): string {
     const y = it.transform?.[5] ?? null;
     const x = it.transform?.[4] ?? null;
     const h = Math.abs(it.transform?.[3] ?? it.height ?? 10) || 10;
-    if (lastY !== null && y !== null && Math.abs(y - lastY) > Math.max(2, lastHeight * 0.5) && !out.endsWith('\n')) out += '\n';
-    else if (lastEndX !== null && x !== null && x - lastEndX > h * 0.2 && !/\s$/.test(out) && !/^\s/.test(it.str) && out && !out.endsWith('\n')) out += ' ';
+    if (
+      lastY !== null &&
+      y !== null &&
+      Math.abs(y - lastY) > Math.max(2, lastHeight * 0.5) &&
+      !out.endsWith('\n')
+    )
+      out += '\n';
+    else if (
+      lastEndX !== null &&
+      x !== null &&
+      x - lastEndX > h * 0.2 &&
+      !/\s$/.test(out) &&
+      !/^\s/.test(it.str) &&
+      out &&
+      !out.endsWith('\n')
+    )
+      out += ' ';
     out += it.str;
     if (it.hasEOL) out += '\n';
     if (y !== null) lastY = y;

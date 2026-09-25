@@ -1,4 +1,6 @@
-import { XMLBuilder, XMLParser, XMLValidator } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
+import { SyntaxValidator } from 'fast-xml-validator';
+import XMLBuilder from 'fast-xml-builder';
 import { ConversionError } from '../types';
 
 export interface ParseXmlOptions {
@@ -9,14 +11,22 @@ const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function parseXml(text: string, opts: ParseXmlOptions): unknown {
-  const input = text.replace(/^﻿/, '').trim();
+  const input = text.replace(/^\ufeff/, '').trim();
   if (!input) throw new ConversionError('EMPTY_INPUT', 'The input is empty.');
   if (/<!ENTITY/i.test(input))
-    throw new ConversionError('MALFORMED_INPUT', 'XML with custom <!ENTITY> declarations is not supported (they can be used to create exponentially large documents).');
-  const valid = XMLValidator.validate(input, { allowBooleanAttributes: true });
-  if (valid !== true) {
-    const { msg, line, col } = valid.err;
-    throw new ConversionError('MALFORMED_INPUT', `Invalid XML at line ${line}, column ${col}: ${msg}`);
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      'XML with custom <!ENTITY> declarations is not supported (they can be used to create exponentially large documents).',
+    );
+  try {
+    SyntaxValidator.validate(input, { allowBooleanAttributes: true });
+  } catch (err) {
+    const e = err as { message?: string; line?: number; col?: number };
+    const where = e.line ? ` at line ${e.line}, column ${e.col ?? 0}` : '';
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      `Invalid XML${where}: ${e.message ?? String(err)}`,
+    );
   }
   const parser = new XMLParser({
     ignoreAttributes: false,
@@ -29,7 +39,6 @@ export function parseXml(text: string, opts: ParseXmlOptions): unknown {
     trimValues: true,
     allowBooleanAttributes: true,
     processEntities: true,
-    htmlEntities: false,
   });
   const out = parser.parse(input) as unknown;
   return sanitizeKeys(out);
@@ -52,7 +61,12 @@ function sanitizeKeys(v: unknown): unknown {
 /** Converts an arbitrary key into a valid XML 1.0 element name. */
 export function xmlName(key: string, fallback = 'item'): string {
   let n = key.normalize('NFC').replace(/[^\p{L}\p{N}_.\-:]/gu, '_');
-  n = n.replace(/:/g, '_');
+  // Keep a single inner colon (namespace prefix, e.g. dc:title); any other colon becomes "_".
+  const parts = n.split(':');
+  n =
+    parts.length === 2 && parts[0] && parts[1] && /^[\p{L}_]/u.test(parts[1])
+      ? n
+      : n.replace(/:/g, '_');
   if (!n) n = fallback;
   if (!/^[\p{L}_]/u.test(n)) n = `_${n}`;
   return n;
@@ -77,12 +91,21 @@ function prepare(value: unknown, itemName: string, prefix: string): unknown {
   if (typeof value !== 'object') return value;
   if (Array.isArray(value)) {
     // Nested arrays have no element name of their own: wrap each in <item>.
-    return value.map((v) => (Array.isArray(v) ? { [itemName]: prepare(v, itemName, prefix) } : prepare(v, itemName, prefix)));
+    return value.map((v) =>
+      Array.isArray(v)
+        ? { [itemName]: prepare(v, itemName, prefix) }
+        : prepare(v, itemName, prefix),
+    );
   }
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value)) {
     if (k === '#text') out[k] = prepare(v, itemName, prefix);
-    else if (prefix && k.startsWith(prefix) && k.length > prefix.length && (v === null || typeof v !== 'object'))
+    else if (
+      prefix &&
+      k.startsWith(prefix) &&
+      k.length > prefix.length &&
+      (v === null || typeof v !== 'object')
+    )
       out[prefix + xmlName(k.slice(prefix.length))] = prepare(v, itemName, prefix);
     else out[xmlName(k, itemName)] = prepare(v, itemName, prefix);
   }
@@ -98,7 +121,10 @@ export function buildXml(value: unknown, opts: BuildXmlOptions): string {
   else if (isPlainObject(value)) {
     const keys = Object.keys(value);
     // A single top-level key holding an object is already a root element (e.g. from XML).
-    tree = keys.length === 1 && isPlainObject(value[keys[0]!]) ? prepare(value, item, prefix) : { [root]: prepare(value, item, prefix) };
+    tree =
+      keys.length === 1 && isPlainObject(value[keys[0]!])
+        ? prepare(value, item, prefix)
+        : { [root]: prepare(value, item, prefix) };
   } else tree = { [root]: prepare(value, item, prefix) };
 
   const builder = new XMLBuilder({

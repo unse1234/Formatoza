@@ -42,7 +42,12 @@ export interface Crumb {
 export function breadcrumbList(crumbs: Crumb[]): Json {
   return {
     '@type': 'BreadcrumbList',
-    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: absoluteUrl(c.path) })),
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: absoluteUrl(c.path),
+    })),
   };
 }
 
@@ -53,9 +58,13 @@ export function webApplication(c: ConversionMeta): Json {
     name: `${c.h1} — ${SITE.name}`,
     url: absoluteUrl(c.path),
     description: c.shortDescription,
-    applicationCategory: c.category === 'developer' || c.category === 'data' ? 'DeveloperApplication' : 'MultimediaApplication',
+    applicationCategory:
+      c.category === 'developer' || c.category === 'data'
+        ? 'DeveloperApplication'
+        : 'MultimediaApplication',
     operatingSystem: 'Any (runs in a web browser)',
-    browserRequirements: 'Requires JavaScript and a current version of Chrome, Edge, Firefox or Safari.',
+    browserRequirements:
+      'Requires JavaScript and a current version of Chrome, Edge, Firefox or Safari.',
     isAccessibleForFree: true,
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: { '@id': ORG_ID },
@@ -67,7 +76,11 @@ export function faqPage(faq: FaqItem[], path: string): Json {
   return {
     '@type': 'FAQPage',
     '@id': `${absoluteUrl(path)}#faq`,
-    mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+    mainEntity: faq.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
   };
 }
 
@@ -81,12 +94,23 @@ export function collectionPage(cat: CategoryInfo, items: ConversionMeta[]): Json
     isPartOf: { '@id': SITE_ID },
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: items.map((c, i) => ({ '@type': 'ListItem', position: i + 1, url: absoluteUrl(c.path), name: c.h1 })),
+      itemListElement: items.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: absoluteUrl(c.path),
+        name: c.h1,
+      })),
     },
   };
 }
 
-export function article(a: { title: string; description: string; path: string; published: Date; updated: Date }): Json {
+export function article(a: {
+  title: string;
+  description: string;
+  path: string;
+  published: Date;
+  updated: Date;
+}): Json {
   return {
     '@type': 'Article',
     '@id': `${absoluteUrl(a.path)}#article`,
@@ -104,5 +128,8 @@ export function article(a: { title: string; description: string; path: string; p
 
 export function graph(...nodes: Json[]): string {
   // Escape "<" so content can never close the <script> element.
-  return JSON.stringify({ '@context': 'https://schema.org', '@graph': nodes }).replace(/</g, '\\u003c');
+  return JSON.stringify({ '@context': 'https://schema.org', '@graph': nodes }).replace(
+    /</g,
+    '\\u003c',
+  );
 }

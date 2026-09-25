@@ -7,7 +7,13 @@ import { outputFileName, dedupeNames, baseName } from '~/lib/file/filename';
 import { readText, textBlob } from '~/lib/file/text';
 import { getOptionFields, resolveOptions, type OptionValues } from '../options';
 import { OUTPUT_TYPE, matchesFormat } from '../shared/extensions';
-import { runPerFile, throwIfAborted, toIssue, validateFiles, warning } from '../shared/engine-utils';
+import {
+  runPerFile,
+  throwIfAborted,
+  toIssue,
+  validateFiles,
+  warning,
+} from '../shared/engine-utils';
 import {
   ConversionError,
   type ConversionContext,
@@ -19,7 +25,14 @@ import {
   type OutputFile,
 } from '../types';
 import { delimiterName, parseDelimited, writeDelimited } from './delimited';
-import { tableToArrays, tableToRecords, treeToTable, typedValue, type Scalar, type Table } from './table';
+import {
+  tableToArrays,
+  tableToRecords,
+  treeToTable,
+  typedValue,
+  type Scalar,
+  type Table,
+} from './table';
 import { buildXml, parseXml } from './xml';
 import { parseJson } from '../shared/json';
 import { parseYaml, stringifyYaml } from './yaml';
@@ -29,7 +42,11 @@ type Parsed = { kind: 'table'; table: Table } | { kind: 'tree'; value: unknown }
 
 const TABLE_FORMATS: FormatId[] = ['csv', 'tsv'];
 
-function parse(text: string, from: FormatId, o: OptionValues): { parsed: Parsed; warnings: ConversionIssue[] } {
+function parse(
+  text: string,
+  from: FormatId,
+  o: OptionValues,
+): { parsed: Parsed; warnings: ConversionIssue[] } {
   switch (from) {
     case 'csv':
     case 'tsv': {
@@ -49,7 +66,13 @@ function parse(text: string, from: FormatId, o: OptionValues): { parsed: Parsed;
       return { parsed: { kind: 'tree', value: r.value }, warnings: r.warnings };
     }
     case 'xml':
-      return { parsed: { kind: 'tree', value: parseXml(text, { attributePrefix: String(o['attributePrefix'] ?? '@') }) }, warnings: [] };
+      return {
+        parsed: {
+          kind: 'tree',
+          value: parseXml(text, { attributePrefix: String(o['attributePrefix'] ?? '@') }),
+        },
+        warnings: [],
+      };
     default:
       throw new ConversionError('UNSUPPORTED_FORMAT', `Cannot read ${from}.`);
   }
@@ -65,21 +88,40 @@ function asTree(parsed: Parsed, o: OptionValues, warnings: ConversionIssue[]): u
   if (parsed.kind === 'tree') return parsed.value;
   const typed = o['typed'] !== false;
   if (o['header'] === false) return tableToArrays(parsed.table, typed);
-  const { records, conflicts } = tableToRecords(parsed.table, { typed, unflatten: o['unflatten'] === true });
+  const { records, conflicts } = tableToRecords(parsed.table, {
+    typed,
+    unflatten: o['unflatten'] === true,
+  });
   if (conflicts.length)
-    warnings.push(warning(`Column${conflicts.length > 1 ? 's' : ''} ${conflicts.slice(0, 5).join(', ')} clashed with a nested path and were kept as separate keys.`));
+    warnings.push(
+      warning(
+        `Column${conflicts.length > 1 ? 's' : ''} ${conflicts.slice(0, 5).join(', ')} clashed with a nested path and were kept as separate keys.`,
+      ),
+    );
   return records;
 }
 
 /** Table view of parsed input (for CSV/TSV/XLSX output). */
-function asTable(parsed: Parsed, o: OptionValues, warnings: ConversionIssue[]): { table: Table; header: boolean } {
+function asTable(
+  parsed: Parsed,
+  o: OptionValues,
+  warnings: ConversionIssue[],
+): { table: Table; header: boolean } {
   if (parsed.kind === 'table') return { table: parsed.table, header: o['header'] !== false };
   const { table, recordPath } = treeToTable(parsed.value, o['flatten'] !== false);
-  if (recordPath) warnings.push(warning(`Used the ${table.rows.length} records found at “${recordPath}” as rows.`));
+  if (recordPath)
+    warnings.push(
+      warning(`Used the ${table.rows.length} records found at “${recordPath}” as rows.`),
+    );
   return { table, header: true };
 }
 
-function serialize(parsed: Parsed, to: FormatId, o: OptionValues, warnings: ConversionIssue[]): string {
+function serialize(
+  parsed: Parsed,
+  to: FormatId,
+  o: OptionValues,
+  warnings: ConversionIssue[],
+): string {
   switch (to) {
     case 'csv':
     case 'tsv': {
@@ -111,12 +153,17 @@ function serialize(parsed: Parsed, to: FormatId, o: OptionValues, warnings: Conv
 }
 
 function tableToSheetRows(table: Table, header: boolean, typed: boolean): Scalar[][] {
-  const convert = (v: Scalar): Scalar => (typed && typeof v === 'string' ? typedValue(v, { maxDigits: 15 }) : v);
+  const convert = (v: Scalar): Scalar =>
+    typed && typeof v === 'string' ? typedValue(v, { maxDigits: 15 }) : v;
   const body = table.rows.map((r) => r.map(convert));
   return header ? [table.columns, ...body] : body;
 }
 
-async function toXlsx(input: ConversionInput, o: OptionValues, ctx?: ConversionContext): Promise<ConversionResult> {
+async function toXlsx(
+  input: ConversionInput,
+  o: OptionValues,
+  ctx?: ConversionContext,
+): Promise<ConversionResult> {
   const sheets: { sheet: Sheet; file: File }[] = [];
   const errors: ConversionIssue[] = [];
   const warnings: ConversionIssue[] = [];
@@ -130,19 +177,37 @@ async function toXlsx(input: ConversionInput, o: OptionValues, ctx?: ConversionC
       w.push(...pw);
       const { table, header } = asTable(parsed, o, w);
       const typed = parsed.kind === 'tree' || o['typed'] !== false;
-      sheets.push({ sheet: { name: baseName(file.name), rows: tableToSheetRows(table, header, typed), styleHeader: header && o['styleHeader'] !== false }, file });
+      sheets.push({
+        sheet: {
+          name: baseName(file.name),
+          rows: tableToSheetRows(table, header, typed),
+          styleHeader: header && o['styleHeader'] !== false,
+        },
+        file,
+      });
       warnings.push(...w.map((x) => ({ ...x, file: file.name })));
     } catch (err) {
       errors.push(toIssue(err, file.name));
     }
   }
   const outputs: OutputFile[] = [];
-  const groups = o['combine'] === 'files' || sheets.length === 1 ? sheets.map((s) => [s]) : sheets.length ? [sheets] : [];
+  const groups =
+    o['combine'] === 'files' || sheets.length === 1
+      ? sheets.map((s) => [s])
+      : sheets.length
+        ? [sheets]
+        : [];
   for (const group of groups) {
     try {
       const { bytes, truncatedCells } = writeXlsx(group.map((g) => g.sheet));
-      if (truncatedCells) warnings.push(warning(`${truncatedCells} cell(s) exceeded Excel's 32,767-character limit and were truncated.`));
-      const name = group.length === 1 ? outputFileName(group[0]!.file.name, '.xlsx') : 'combined.xlsx';
+      if (truncatedCells)
+        warnings.push(
+          warning(
+            `${truncatedCells} cell(s) exceeded Excel's 32,767-character limit and were truncated.`,
+          ),
+        );
+      const name =
+        group.length === 1 ? outputFileName(group[0]!.file.name, '.xlsx') : 'combined.xlsx';
       const rows = group.reduce((n, g) => n + g.sheet.rows.length, 0);
       outputs.push({
         name,
@@ -173,8 +238,15 @@ export const dataEngineCore: ConverterEngine = {
 
   async convert(input, rawOptions, ctx) {
     const o = resolveOptions(getOptionFields('data', input.from, input.to), rawOptions);
-    if (!SOURCE_FORMATS.includes(input.from) || !TARGET_FORMATS.includes(input.to) || input.from === input.to)
-      throw new ConversionError('UNSUPPORTED_FORMAT', `${input.from} → ${input.to} is not supported.`);
+    if (
+      !SOURCE_FORMATS.includes(input.from) ||
+      !TARGET_FORMATS.includes(input.to) ||
+      input.from === input.to
+    )
+      throw new ConversionError(
+        'UNSUPPORTED_FORMAT',
+        `${input.from} → ${input.to} is not supported.`,
+      );
     if (input.to === 'xlsx') return toXlsx(input, o, ctx);
     const out = OUTPUT_TYPE[input.to];
     const result = await runPerFile(input.files, ctx, async (file) => {
@@ -192,7 +264,9 @@ export const dataEngineCore: ConverterEngine = {
             mimeType: out.mime,
             blob: textBlob(body, out.mime, input.to === 'csv' && o['bom'] === true),
             sourceName: file.name,
-            ...(rows !== undefined && !TABLE_FORMATS.includes(input.to) ? { details: { Records: rows.toLocaleString('en-US') } } : {}),
+            ...(rows !== undefined && !TABLE_FORMATS.includes(input.to)
+              ? { details: { Records: rows.toLocaleString('en-US') } }
+              : {}),
           },
         ],
         warnings,

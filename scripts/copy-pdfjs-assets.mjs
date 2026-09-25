@@ -17,6 +17,7 @@ if (existsSync(stamp) && readFileSync(stamp, 'utf8') === version) {
 }
 rmSync(dest, { recursive: true, force: true });
 mkdirSync(dest, { recursive: true });
-for (const dir of ['cmaps', 'standard_fonts', 'wasm', 'iccs']) cpSync(join(pkgDir, dir), join(dest, dir), { recursive: true });
+for (const dir of ['cmaps', 'standard_fonts', 'wasm', 'iccs'])
+  cpSync(join(pkgDir, dir), join(dest, dir), { recursive: true });
 writeFileSync(stamp, version);
 console.log(`[pdfjs-assets] copied PDF.js ${version} data to public/vendor/pdfjs`);

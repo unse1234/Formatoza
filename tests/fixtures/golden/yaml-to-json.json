@@ -1,0 +1,19 @@
+{
+  "service": {
+    "name": "checkout",
+    "replicas": 3,
+    "enabled": "yes",
+    "country": "NO",
+    "ports": [
+      8080,
+      8443
+    ]
+  },
+  "defaults": {
+    "timeout": 30
+  },
+  "worker": {
+    "timeout": 30,
+    "queue": "orders"
+  }
+}

@@ -18,7 +18,10 @@ const crumbs = [
 ];
 ---
 
-<BaseLayout meta={{ title, description, path }} jsonLd={graph(organization(), website(), breadcrumbList(crumbs))}>
+<BaseLayout
+  meta={{ title, description, path }}
+  jsonLd={graph(organization(), website(), breadcrumbList(crumbs))}
+>
   <div class="container-page max-w-3xl pt-6 sm:pt-8">
     <Breadcrumbs items={crumbs} />
     <header class="mt-8">

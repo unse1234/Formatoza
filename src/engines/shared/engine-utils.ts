@@ -23,14 +23,16 @@ export function tick(): Promise<void> {
 export function validateFiles(input: ConversionInput, limits: ConversionLimits): ValidationResult {
   const errors: ConversionIssue[] = [];
   const warnings: ConversionIssue[] = [];
-  if (input.files.length === 0) errors.push({ code: 'EMPTY_INPUT', message: 'Add at least one file.' });
+  if (input.files.length === 0)
+    errors.push({ code: 'EMPTY_INPUT', message: 'Add at least one file.' });
   if (input.files.length > limits.maxFiles)
     errors.push({
       code: 'TOO_MANY_FILES',
       message: `You can convert up to ${limits.maxFiles} files at once; ${input.files.length} were added.`,
     });
   for (const f of input.files) {
-    if (f.size === 0) errors.push({ code: 'EMPTY_INPUT', message: 'This file is empty.', file: f.name });
+    if (f.size === 0)
+      errors.push({ code: 'EMPTY_INPUT', message: 'This file is empty.', file: f.name });
     else if (f.size > limits.maxFileBytes)
       errors.push({
         code: 'FILE_TOO_LARGE',
@@ -48,8 +50,10 @@ export function validateFiles(input: ConversionInput, limits: ConversionLimits):
 }
 
 export function toIssue(err: unknown, file?: string): ConversionIssue {
-  if (err instanceof ConversionError) return { code: err.code, message: err.message, ...(file ? { file } : {}) };
-  const message = err instanceof Error && err.message ? err.message : 'Unexpected error while converting.';
+  if (err instanceof ConversionError)
+    return { code: err.code, message: err.message, ...(file ? { file } : {}) };
+  const message =
+    err instanceof Error && err.message ? err.message : 'Unexpected error while converting.';
   return { code: 'INTERNAL', message, ...(file ? { file } : {}) };
 }
 
@@ -60,7 +64,11 @@ export function toIssue(err: unknown, file?: string): ConversionIssue {
 export async function runPerFile(
   files: File[],
   context: ConversionContext | undefined,
-  convertOne: (file: File, index: number, report: (fraction: number) => void) => Promise<{ outputs: OutputFile[]; warnings?: ConversionIssue[] }>,
+  convertOne: (
+    file: File,
+    index: number,
+    report: (fraction: number) => void,
+  ) => Promise<{ outputs: OutputFile[]; warnings?: ConversionIssue[] }>,
 ): Promise<ConversionResult> {
   const result: ConversionResult = { outputs: [], errors: [], warnings: [] };
   const total = files.length;
@@ -76,7 +84,8 @@ export async function runPerFile(
     try {
       const r = await convertOne(file, i, report);
       result.outputs.push(...r.outputs);
-      if (r.warnings) result.warnings.push(...r.warnings.map((w) => ({ ...w, file: w.file ?? file.name })));
+      if (r.warnings)
+        result.warnings.push(...r.warnings.map((w) => ({ ...w, file: w.file ?? file.name })));
     } catch (err) {
       if (err instanceof ConversionError && err.code === 'ABORTED') throw err;
       if (context?.signal?.aborted) throw new ConversionError('ABORTED', 'Conversion cancelled.');

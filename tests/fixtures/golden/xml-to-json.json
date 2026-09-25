@@ -1,0 +1,30 @@
+{
+  "catalog": {
+    "book": [
+      {
+        "dc:title": "XML Developer's Guide",
+        "price": {
+          "#text": "44.95",
+          "@currency": "USD"
+        },
+        "tag": [
+          "xml",
+          "dev"
+        ],
+        "@id": "bk101",
+        "@lang": "en"
+      },
+      {
+        "dc:title": "Le Petit Prince & moi",
+        "price": {
+          "#text": "9.50",
+          "@currency": "EUR"
+        },
+        "tag": "fiction",
+        "@id": "bk102",
+        "@lang": "fr"
+      }
+    ],
+    "@xmlns:dc": "http://purl.org/dc/elements/1.1/"
+  }
+}

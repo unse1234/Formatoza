@@ -37,23 +37,34 @@ const cfBeacon = (import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '').trim();
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content={SITE.themeColor.light} media="(prefers-color-scheme: light)" />
+    <meta
+      name="theme-color"
+      content={SITE.themeColor.light}
+      media="(prefers-color-scheme: light)"
+    />
     <meta name="theme-color" content={SITE.themeColor.dark} media="(prefers-color-scheme: dark)" />
     <meta name="format-detection" content="telephone=no" />
     {ADS.enabled && <meta name="google-adsense-account" content={ADS.client} />}
     {jsonLd && <JsonLd json={jsonLd} />}
-    {
-      loadAds && (
-        <>
-          <script is:inline set:html={consentDefaultsScript()} />
-          <script is:inline set:html={adLoader} />
-        </>
-      )
-    }
-    {cfBeacon && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfBeacon, spa: false })} />}
+    {loadAds && (
+      <>
+        <script is:inline set:html={consentDefaultsScript()} />
+        <script is:inline set:html={adLoader} />
+      </>
+    )}
+    {cfBeacon && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: cfBeacon, spa: false })}
+      />
+    )}
   </head>
   <body class="flex min-h-dvh flex-col">
-    <a href="#main" class="sr-only-focusable fixed top-2 left-2 z-[100] btn btn-primary btn-sm">Skip to content</a>
+    <a href="#main" class="sr-only-focusable fixed top-2 left-2 z-[100] btn btn-primary btn-sm">
+      Skip to content
+    </a>
     <Header hideSearch={hideHeaderSearch} />
     <main id="main" class="flex-1" tabindex="-1">
       <slot />

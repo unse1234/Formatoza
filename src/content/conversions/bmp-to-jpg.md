@@ -29,7 +29,7 @@ limitations:
   - >-
     Compressed BMP variants depend on browser support; the fallback decoder covers uncompressed and bitfield BMPs.
 faq:
-  - q: "How much smaller will the JPG be?"
+  - q: "How much smaller is a JPG than the original BMP?"
     a: >-
       Commonly 90–95% smaller than an uncompressed BMP photo at 85–90% quality.
   - q: "Should I use JPG or PNG for BMP files?"

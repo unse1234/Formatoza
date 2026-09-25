@@ -9,11 +9,14 @@ export async function zipBlobs(files: { name: string; blob: Blob }[]): Promise<B
     while (used.has(name.toLowerCase())) name = f.name.replace(/(\.[^.]*)?$/, ` (${n++})$1`);
     used.add(name.toLowerCase());
     // Already-compressed formats are stored; text is deflated.
-    const compressed = /^(image\/(jpeg|png|webp|gif|avif)|application\/(pdf|zip|vnd\.openxml))/.test(f.blob.type);
+    const compressed =
+      /^(image\/(jpeg|png|webp|gif|avif)|application\/(pdf|zip|vnd\.openxml))/.test(f.blob.type);
     entries[name] = [new Uint8Array(await f.blob.arrayBuffer()), { level: compressed ? 0 : 6 }];
   }
   return new Promise((resolve, reject) =>
-    zip(entries, (err, data) => (err ? reject(err) : resolve(new Blob([data as BlobPart], { type: 'application/zip' })))),
+    zip(entries, (err, data) =>
+      err ? reject(err) : resolve(new Blob([data as BlobPart], { type: 'application/zip' })),
+    ),
   );
 }
 

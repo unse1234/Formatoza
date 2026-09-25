@@ -20,10 +20,16 @@ export function defaultSteps(c: ConversionMeta): string[] {
     .map((f) => f.label.toLowerCase());
   const steps = [first];
   if (c.output.combinesInputs && c.input.multiple)
-    steps.push('Check the order in the file list — use the arrow buttons to move files up or down. The output follows this order.');
+    steps.push(
+      'Check the order in the file list — use the arrow buttons to move files up or down. The output follows this order.',
+    );
   if (settings.length)
-    steps.push(`Optionally open Settings to adjust ${list(settings.slice(0, 4))}. The defaults work well for most files.`);
-  steps.push(`Select “Convert to ${dst}”. The conversion runs in this browser tab — nothing is uploaded — and you can cancel at any time.`);
+    steps.push(
+      `Optionally open Settings to adjust ${list(settings.slice(0, 4))}. The defaults work well for most files.`,
+    );
+  steps.push(
+    `Select “Convert to ${dst}”. The conversion runs in this browser tab — nothing is uploaded — and you can cancel at any time.`,
+  );
   steps.push(
     c.output.preview === 'text' || c.output.preview === 'html'
       ? `Review the result, then copy it to your clipboard or download it as a ${c.output.extension} file.`

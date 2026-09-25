@@ -20,13 +20,23 @@ export interface ResolvedMeta {
   description: string;
   canonical: string;
   robots: string;
-  og: { type: string; title: string; description: string; url: string; image: string; imageAlt: string; siteName: string; locale: string };
+  og: {
+    type: string;
+    title: string;
+    description: string;
+    url: string;
+    image: string;
+    imageAlt: string;
+    siteName: string;
+    locale: string;
+  };
   publishedTime?: string | undefined;
   modifiedTime?: string | undefined;
 }
 
 export function resolveMeta(m: PageMeta): ResolvedMeta {
-  if (!m.path.startsWith('/') || !m.path.endsWith('/')) throw new Error(`[seo] path must start and end with "/": ${m.path}`);
+  if (!m.path.startsWith('/') || !m.path.endsWith('/'))
+    throw new Error(`[seo] path must start and end with "/": ${m.path}`);
   const title = m.brandSuffix === false ? m.title : `${m.title} | ${SITE.name}`;
   const canonical = absoluteUrl(m.path);
   const image = absoluteUrl(m.image ?? '/og/default.png');
@@ -34,7 +44,9 @@ export function resolveMeta(m: PageMeta): ResolvedMeta {
     title,
     description: m.description,
     canonical,
-    robots: m.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1',
+    robots: m.noindex
+      ? 'noindex, follow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1',
     og: {
       type: m.type ?? 'website',
       title: m.title,

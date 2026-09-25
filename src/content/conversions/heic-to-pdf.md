@@ -37,7 +37,7 @@ faq:
     a: >-
       Yes. Open this page in Safari, choose “Choose files”, select photos from your library, reorder if needed, and
       download the PDF.
-  - q: "Are my photos uploaded?"
+  - q: "Are my iPhone photos uploaded to a server?"
     a: >-
       No. They are decoded and assembled into a PDF inside your browser.
   - q: "How big will the PDF be?"

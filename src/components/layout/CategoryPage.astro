@@ -21,10 +21,16 @@ const crumbs = [
 ];
 const guide = await getEntry('guides', cat.guide);
 // Group by source format so the hub reads like an index, not a flat list.
-const groups = [...new Set(tools.map((t) => t.source.name))].map((name) => ({ name, items: tools.filter((t) => t.source.name === name) }));
+const groups = [...new Set(tools.map((t) => t.source.name))].map((name) => ({
+  name,
+  items: tools.filter((t) => t.source.name === name),
+}));
 ---
 
-<BaseLayout meta={{ title: cat.title, description: cat.metaDescription, path, brandSuffix: false }} jsonLd={graph(organization(), website(), breadcrumbList(crumbs), collectionPage(cat, tools))}>
+<BaseLayout
+  meta={{ title: cat.title, description: cat.metaDescription, path, brandSuffix: false }}
+  jsonLd={graph(organization(), website(), breadcrumbList(crumbs), collectionPage(cat, tools))}
+>
   <div class="container-page pt-6 sm:pt-8">
     <Breadcrumbs items={crumbs} />
     <header class="mt-8 max-w-3xl">
@@ -32,45 +38,44 @@ const groups = [...new Set(tools.map((t) => t.source.name))].map((name) => ({ na
       <h1 class="t-display mt-3">{cat.headline}</h1>
       <p class="mt-5 text-lg leading-relaxed text-fg-2">{cat.intro}</p>
     </header>
-    <div class="mt-8"><CategoryNav active={cat.id} /></div>
+    <div class="mt-8">
+      <CategoryNav active={cat.id} />
+    </div>
 
     <div class="mt-10 grid gap-10">
-      {
-        groups.map((g) => (
-          <section aria-labelledby={`g-${g.name}`}>
-            <h2 id={`g-${g.name}`} class="t-eyebrow">
-              From {g.name}
-            </h2>
-            <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {g.items.map((t) => (
-                <li>
-                  <ToolCard tool={t} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      }
+      {groups.map((g) => (
+        <section aria-labelledby={`g-${g.name}`}>
+          <h2 id={`g-${g.name}`} class="t-eyebrow">
+            From {g.name}
+          </h2>
+          <ul class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {g.items.map((t) => (
+              <li>
+                <ToolCard tool={t} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
 
     <TrustStrip class="mt-12" processing="local" />
 
     <div class="mt-14 grid gap-10 lg:grid-cols-2">
-      {
-        cat.sections.map((s) => (
-          <section class="prose-fz">
-            <h2 class="!mt-0">{s.heading}</h2>
-            <p>{s.body}</p>
-          </section>
-        ))
-      }
+      {cat.sections.map((s) => (
+        <section class="prose-fz">
+          <h2 class="!mt-0">{s.heading}</h2>
+          <p>{s.body}</p>
+        </section>
+      ))}
     </div>
-    {
-      guide && (
-        <p class="mt-10 text-[15px] text-fg-2">
-          Go deeper: <a class="link" href={`/guides/${guide.id}/`}>{guide.data.h1}</a>
-        </p>
-      )
-    }
+    {guide && (
+      <p class="mt-10 text-[15px] text-fg-2">
+        Go deeper:{' '}
+        <a class="link" href={`/guides/${guide.id}/`}>
+          {guide.data.h1}
+        </a>
+      </p>
+    )}
   </div>
 </BaseLayout>

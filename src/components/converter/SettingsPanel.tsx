@@ -17,10 +17,13 @@ function summary(fields: OptionField[], values: OptionValues): string {
     const v = values[f.key];
     if (f.type === 'select') parts.push(f.choices.find((c) => c.value === v)?.label ?? String(v));
     else if (f.type === 'boolean') parts.push(`${f.label}: ${v ? 'on' : 'off'}`);
-    else if (f.type === 'range' || f.type === 'number') parts.push(`${f.label} ${v}${f.unit ?? ''}`);
+    else if (f.type === 'range' || f.type === 'number')
+      parts.push(`${f.label} ${v}${f.unit ?? ''}`);
     else parts.push(`${f.label}: ${String(v) || '—'}`);
   }
-  return parts.length ? parts.slice(0, 3).join(' · ') + (parts.length > 3 ? ' …' : '') : 'Default settings';
+  return parts.length
+    ? parts.slice(0, 3).join(' · ') + (parts.length > 3 ? ' …' : '')
+    : 'Default settings';
 }
 
 export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen = false }: Props) {
@@ -41,8 +44,12 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
       >
         <SettingsIcon className="shrink-0 text-fg-2" />
         <span className="text-sm font-medium text-fg">Settings</span>
-        <span className="min-w-0 flex-1 truncate text-[13px] text-fg-3">{summary(fields, values)}</span>
-        <ChevronIcon className={`shrink-0 text-fg-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+        <span className="min-w-0 flex-1 truncate text-[13px] text-fg-3">
+          {summary(fields, values)}
+        </span>
+        <ChevronIcon
+          className={`shrink-0 text-fg-3 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
       </button>
       <div id={panelId} hidden={!open} className="px-4 pt-1 pb-4">
         <fieldset disabled={disabled} className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -75,7 +82,10 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
               );
             return (
               <div key={f.key}>
-                <label htmlFor={id} className="mb-1.5 flex items-baseline justify-between text-[13px] font-medium text-fg-2">
+                <label
+                  htmlFor={id}
+                  className="mb-1.5 flex items-baseline justify-between text-[13px] font-medium text-fg-2"
+                >
                   {f.label}
                   {f.type === 'range' && (
                     <span className="font-mono text-xs text-fg">
@@ -85,7 +95,13 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
                   )}
                 </label>
                 {f.type === 'select' && (
-                  <select id={id} className="field cursor-pointer" value={String(v)} aria-describedby={helpId} onChange={(e) => onChange(f.key, e.target.value)}>
+                  <select
+                    id={id}
+                    className="field cursor-pointer"
+                    value={String(v)}
+                    aria-describedby={helpId}
+                    onChange={(e) => onChange(f.key, e.target.value)}
+                  >
                     {f.choices.map((c) => (
                       <option key={c.value} value={c.value}>
                         {c.label}
@@ -118,9 +134,15 @@ export function SettingsPanel({ fields, values, disabled, onChange, defaultOpen 
                       step={f.step}
                       value={Number(v)}
                       aria-describedby={helpId}
-                      onChange={(e) => onChange(f.key, e.target.value === '' ? f.default : Number(e.target.value))}
+                      onChange={(e) =>
+                        onChange(f.key, e.target.value === '' ? f.default : Number(e.target.value))
+                      }
                     />
-                    {f.unit && <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 font-mono text-xs text-fg-3">{f.unit}</span>}
+                    {f.unit && (
+                      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 font-mono text-xs text-fg-3">
+                        {f.unit}
+                      </span>
+                    )}
                   </div>
                 )}
                 {f.type === 'text' && (

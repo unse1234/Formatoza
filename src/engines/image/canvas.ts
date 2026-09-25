@@ -8,11 +8,15 @@ export type Drawable = ImageBitmap | HTMLImageElement | HTMLCanvasElement | Offs
 type AnyCanvas = HTMLCanvasElement | OffscreenCanvas;
 
 const isAppleMobile = () =>
-  typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  typeof navigator !== 'undefined' &&
+  (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
 
 /** Conservative per-browser canvas limits (iOS Safari caps canvases at 16.7 MP). */
 export function canvasLimits(): { maxArea: number; maxDim: number } {
-  return isAppleMobile() ? { maxArea: 16_777_216, maxDim: 16_384 } : { maxArea: 268_435_456, maxDim: 16_384 };
+  return isAppleMobile()
+    ? { maxArea: 16_777_216, maxDim: 16_384 }
+    : { maxArea: 268_435_456, maxDim: 16_384 };
 }
 
 export function createCanvas(width: number, height: number): AnyCanvas {
@@ -23,9 +27,16 @@ export function createCanvas(width: number, height: number): AnyCanvas {
   return c;
 }
 
-function context2d(canvas: AnyCanvas): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D {
-  const ctx = canvas.getContext('2d', { alpha: true }) as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
-  if (!ctx) throw new ConversionError('BROWSER_UNSUPPORTED', 'Your browser could not create a drawing surface of this size. Try a smaller output size.');
+function context2d(
+  canvas: AnyCanvas,
+): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D {
+  const ctx = canvas.getContext('2d', { alpha: true }) as
+    CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
+  if (!ctx)
+    throw new ConversionError(
+      'BROWSER_UNSUPPORTED',
+      'Your browser could not create a drawing surface of this size. Try a smaller output size.',
+    );
   return ctx;
 }
 
@@ -43,7 +54,12 @@ export function planSize(width: number, height: number): RenderPlan {
 }
 
 /** Draws a source onto a new canvas, optionally over a solid background. */
-export function drawToCanvas(source: Drawable, width: number, height: number, background?: string): AnyCanvas {
+export function drawToCanvas(
+  source: Drawable,
+  width: number,
+  height: number,
+  background?: string,
+): AnyCanvas {
   const canvas = createCanvas(width, height);
   const ctx = context2d(canvas);
   if (background) {
@@ -56,7 +72,11 @@ export function drawToCanvas(source: Drawable, width: number, height: number, ba
   return canvas;
 }
 
-async function canvasToBlob(canvas: AnyCanvas, type: string, quality?: number): Promise<Blob | null> {
+async function canvasToBlob(
+  canvas: AnyCanvas,
+  type: string,
+  quality?: number,
+): Promise<Blob | null> {
   if ('convertToBlob' in canvas) {
     try {
       return await canvas.convertToBlob({ type, ...(quality !== undefined ? { quality } : {}) });
@@ -87,10 +107,18 @@ export function canEncodeWebp(): Promise<boolean> {
 }
 
 export type RasterTarget = 'jpg' | 'png' | 'webp';
-const MIME: Record<RasterTarget, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const MIME: Record<RasterTarget, string> = {
+  jpg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+};
 
 /** Encodes a canvas into the target format; WebP falls back to a WASM encoder when needed. */
-export async function encodeCanvas(canvas: AnyCanvas, target: RasterTarget, quality01: number): Promise<Blob> {
+export async function encodeCanvas(
+  canvas: AnyCanvas,
+  target: RasterTarget,
+  quality01: number,
+): Promise<Blob> {
   const mime = MIME[target];
   if (target === 'webp' && !(await canEncodeWebp())) {
     const { encode } = await import('@jsquash/webp');
@@ -100,8 +128,15 @@ export async function encodeCanvas(canvas: AnyCanvas, target: RasterTarget, qual
   }
   const blob = await canvasToBlob(canvas, mime, target === 'png' ? undefined : quality01);
   if (!blob || blob.size === 0)
-    throw new ConversionError('BROWSER_UNSUPPORTED', 'Your browser failed to encode the image — it may be too large for this device. Try a smaller output size.');
-  if (blob.type !== mime) throw new ConversionError('BROWSER_UNSUPPORTED', `Your browser cannot write ${target.toUpperCase()} images.`);
+    throw new ConversionError(
+      'BROWSER_UNSUPPORTED',
+      'Your browser failed to encode the image — it may be too large for this device. Try a smaller output size.',
+    );
+  if (blob.type !== mime)
+    throw new ConversionError(
+      'BROWSER_UNSUPPORTED',
+      `Your browser cannot write ${target.toUpperCase()} images.`,
+    );
   return blob;
 }
 

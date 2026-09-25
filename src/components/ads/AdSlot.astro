@@ -15,17 +15,28 @@ const slot = ADS.slotFor(placement);
 const show = Boolean(slot) || ADS.placeholders;
 ---
 
-{
-  show && (
-    <aside class:list={['fz-ad my-10', className]} aria-label="Advertisement" data-ad-placement={placement}>
-      <p class="mb-2 text-center text-[11px] font-medium tracking-wide text-fg-3 uppercase">Advertisement</p>
-      {slot ? (
-        <div class="min-h-[250px] overflow-hidden rounded-lg">
-          <ins class="adsbygoogle block" style="display:block" data-ad-client={ADS.client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true" />
-        </div>
-      ) : (
-        <AdSlotPlaceholder placement={placement} />
-      )}
-    </aside>
-  )
-}
+{show && (
+  <aside
+    class:list={['fz-ad my-10', className]}
+    aria-label="Advertisement"
+    data-ad-placement={placement}
+  >
+    <p class="mb-2 text-center text-[11px] font-medium tracking-wide text-fg-3 uppercase">
+      Advertisement
+    </p>
+    {slot ? (
+      <div class="min-h-[250px] overflow-hidden rounded-lg">
+        <ins
+          class="adsbygoogle block"
+          style="display:block"
+          data-ad-client={ADS.client}
+          data-ad-slot={slot}
+          data-ad-format="auto"
+          data-full-width-responsive="true"
+        />
+      </div>
+    ) : (
+      <AdSlotPlaceholder placement={placement} />
+    )}
+  </aside>
+)}

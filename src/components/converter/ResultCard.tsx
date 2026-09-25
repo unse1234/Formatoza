@@ -19,7 +19,8 @@ function kindOf(o: OutputFile, fallback: OutputSpec['preview']): OutputSpec['pre
   if (o.mimeType.startsWith('image/')) return 'image';
   if (o.mimeType === 'application/pdf') return 'pdf';
   if (o.mimeType === 'text/html') return 'html';
-  if (o.mimeType.startsWith('text/') || /json|xml|yaml|subrip|x-ssa/.test(o.mimeType)) return 'text';
+  if (o.mimeType.startsWith('text/') || /json|xml|yaml|subrip|x-ssa/.test(o.mimeType))
+    return 'text';
   return fallback === 'image' || fallback === 'text' || fallback === 'html' ? 'binary' : fallback;
 }
 
@@ -44,7 +45,9 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
   useEffect(() => {
     if (view !== 'rendered' || text === null || rendered !== null) return;
     let alive = true;
-    void import('~/lib/security/sanitize').then(({ sanitizeHtml }) => alive && setRendered(sanitizeHtml(text, { allowImages: true })));
+    void import('~/lib/security/sanitize').then(
+      ({ sanitizeHtml }) => alive && setRendered(sanitizeHtml(text, { allowImages: true })),
+    );
     return () => {
       alive = false;
     };
@@ -66,10 +69,18 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
   const truncated = text !== null && text.length > TEXT_PREVIEW_LIMIT;
 
   return (
-    <li className="animate-enter overflow-hidden rounded-lg bg-surface shadow-border" data-testid="result">
+    <li
+      className="animate-enter overflow-hidden rounded-lg bg-surface shadow-border"
+      data-testid="result"
+    >
       {kind === 'image' && (
         <div className="checker flex max-h-80 min-h-32 items-center justify-center overflow-hidden p-3 shadow-[0_1px_0_0_var(--border)]">
-          <img src={url} alt={`Converted: ${output.name}`} className="max-h-72 max-w-full object-contain" decoding="async" />
+          <img
+            src={url}
+            alt={`Converted: ${output.name}`}
+            className="max-h-72 max-w-full object-contain"
+            decoding="async"
+          />
         </div>
       )}
       {(kind === 'text' || kind === 'html') && (
@@ -105,14 +116,21 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
               aria-label={`Contents of ${output.name}`}
               data-testid="result-text"
             >
-              {text === null ? 'Loading preview…' : truncated ? `${text.slice(0, TEXT_PREVIEW_LIMIT)}\n\n… preview truncated — download or copy for the full result.` : text || '(empty)'}
+              {text === null
+                ? 'Loading preview…'
+                : truncated
+                  ? `${text.slice(0, TEXT_PREVIEW_LIMIT)}\n\n… preview truncated — download or copy for the full result.`
+                  : text || '(empty)'}
             </pre>
           )}
         </div>
       )}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3 p-3 sm:px-4">
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 truncate text-sm font-medium text-fg" title={output.name}>
+          <p
+            className="flex items-center gap-2 truncate text-sm font-medium text-fg"
+            title={output.name}
+          >
             <span className="dot bg-dot-green" aria-hidden="true" />
             <span className="truncate">{output.name}</span>
           </p>
@@ -123,7 +141,13 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {(kind === 'text' || kind === 'html') && (
-            <button type="button" className="btn btn-secondary btn-sm" onClick={copy} disabled={text === null} aria-live="polite">
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={copy}
+              disabled={text === null}
+              aria-live="polite"
+            >
               {copied ? <CheckIcon /> : <CopyIcon />}
               {copied ? 'Copied' : 'Copy'}
             </button>
@@ -134,7 +158,13 @@ export function ResultCard({ output, preview, tool, expanded = false }: Props) {
               Open
             </a>
           )}
-          <a className="btn btn-primary btn-sm" href={url} download={output.name} onClick={() => track('download', { tool })} data-testid="download">
+          <a
+            className="btn btn-primary btn-sm"
+            href={url}
+            download={output.name}
+            onClick={() => track('download', { tool })}
+            data-testid="download"
+          >
             <DownloadIcon />
             Download
           </a>

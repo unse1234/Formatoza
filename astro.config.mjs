@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { loadEnv } from 'vite';
+import rehypeScrollable from './src/lib/markdown/rehype-scrollable.mjs';
 
 const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
 const SITE_URL = (env.PUBLIC_SITE_URL || 'https://formatoza.com').replace(/\/+$/, '');
@@ -22,6 +23,8 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   compressHTML: true,
+  // Code samples in content are short; plain, theme-aware styling beats a second color scheme.
+  markdown: { syntaxHighlight: false, rehypePlugins: [rehypeScrollable] },
   prefetch: false,
   integrations: [
     react(),

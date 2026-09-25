@@ -40,11 +40,15 @@ export const FORMATS: Record<FormatId, FormatInfo> = (() => {
   for (const id of FORMAT_IDS) {
     const f = raw[id];
     assert(f, `format "${id}" missing from supported-formats.json`);
-    assert(f.extensions.every((e) => e.startsWith('.') && e === e.toLowerCase()), `format ${id}: bad extensions`);
+    assert(
+      f.extensions.every((e) => e.startsWith('.') && e === e.toLowerCase()),
+      `format ${id}: bad extensions`,
+    );
     assert(f.summary.length > 200, `format ${id}: summary too short`);
     out[id] = { id, ...f };
   }
-  for (const id of Object.keys(raw)) assert((FORMAT_IDS as readonly string[]).includes(id), `unknown format "${id}"`);
+  for (const id of Object.keys(raw))
+    assert((FORMAT_IDS as readonly string[]).includes(id), `unknown format "${id}"`);
   return out;
 })();
 
@@ -85,7 +89,13 @@ function inputSpec(r: ConversionRecord): InputSpec {
   switch (r.engine) {
     case 'image': {
       const perFile = r.from === 'tiff' ? 150 : r.from === 'heic' ? 60 : 80;
-      return { ...base, textInput: r.from === 'svg', multiple: true, maxFiles: 50, maxFileBytes: perFile * MB };
+      return {
+        ...base,
+        textInput: r.from === 'svg',
+        multiple: true,
+        maxFiles: 50,
+        maxFileBytes: perFile * MB,
+      };
     }
     case 'pdf':
       return r.from === 'pdf'
@@ -116,31 +126,44 @@ function outputSpec(r: ConversionRecord): OutputSpec {
   const extension = OUTPUT_EXTENSION[r.to] ?? t.extensions[0]!;
   const mimeType = t.mimeTypes[0]!;
   const preview: OutputSpec['preview'] =
-    t.kind === 'image' ? 'image' : r.to === 'pdf' ? 'pdf' : r.to === 'html' ? 'html' : r.to === 'xlsx' ? 'binary' : 'text';
+    t.kind === 'image'
+      ? 'image'
+      : r.to === 'pdf'
+        ? 'pdf'
+        : r.to === 'html'
+          ? 'html'
+          : r.to === 'xlsx'
+            ? 'binary'
+            : 'text';
   return { extension, mimeType, preview, combinesInputs: r.to === 'pdf' || r.to === 'xlsx' };
 }
 
-function lazyAssets(r: ConversionRecord): Pick<ConversionMeta, 'browserProcessing' | 'lazyAssetNote'> {
+function lazyAssets(
+  r: ConversionRecord,
+): Pick<ConversionMeta, 'browserProcessing' | 'lazyAssetNote'> {
   if (r.from === 'heic')
     return {
       browserProcessing: 'local-lazy-assets',
       lazyAssetNote:
-        'Safari 17+ decodes HEIC natively. Other browsers download a one-time HEIC decoder (about 3 MB) the first time you convert; it runs on your device.',
+        'Safari 17+ decodes HEIC natively. Other browsers download a one-time HEIC decoder (about 700 KB) the first time you convert; it runs on your device.',
     };
   if (r.from === 'pdf')
     return {
       browserProcessing: 'local-lazy-assets',
-      lazyAssetNote: 'The PDF.js renderer (about 1.5 MB) is downloaded when you add your first PDF and runs on your device.',
+      lazyAssetNote:
+        'The PDF.js renderer (about 530 KB) is downloaded when you convert your first PDF and runs on your device.',
     };
   if (r.to === 'pdf')
     return {
       browserProcessing: 'local-lazy-assets',
-      lazyAssetNote: 'A PDF writer library (about 500 KB) is downloaded when you start converting and runs on your device.',
+      lazyAssetNote:
+        'A PDF writer library (about 160 KB) is downloaded when you start converting and runs on your device.',
     };
   if (r.from === 'docx')
     return {
       browserProcessing: 'local-lazy-assets',
-      lazyAssetNote: 'A DOCX reader (about 600 KB) is downloaded when you add your first document and runs on your device.',
+      lazyAssetNote:
+        'A DOCX reader (about 120 KB) is downloaded when you convert your first document and runs on your device.',
     };
   return { browserProcessing: 'local' };
 }
@@ -157,19 +180,38 @@ export const CONVERSIONS: ConversionMeta[] = (() => {
     const pairKey = `${r.from}>${r.to}`;
     assert(!pairKeys.has(pairKey), `duplicate conversion pair ${pairKey}`);
     pairKeys.add(pairKey);
-    assert((FORMAT_IDS as readonly string[]).includes(r.from), `${r.slug}: unknown source ${r.from}`);
+    assert(
+      (FORMAT_IDS as readonly string[]).includes(r.from),
+      `${r.slug}: unknown source ${r.from}`,
+    );
     assert((FORMAT_IDS as readonly string[]).includes(r.to), `${r.slug}: unknown target ${r.to}`);
     assert((CATEGORY_IDS as readonly string[]).includes(r.category), `${r.slug}: unknown category`);
     assert((ENGINE_IDS as readonly string[]).includes(r.engine), `${r.slug}: unknown engine`);
-    assert(engineSupports(r.engine, r.from, r.to), `${r.slug}: engine ${r.engine} can't do ${pairKey}`);
-    assert(r.title.length > 20 && r.title.length <= 58, `${r.slug}: title length ${r.title.length}`);
-    assert(r.metaDescription.length >= 110 && r.metaDescription.length <= 160, `${r.slug}: meta length`);
-    assert(r.secondaryKeywords.length >= 3 && r.secondaryKeywords.length <= 8, `${r.slug}: 3–8 secondary keywords`);
-    assert(r.semanticTerms.length >= 2 && r.semanticTerms.length <= 5, `${r.slug}: 2–5 semantic terms`);
+    assert(
+      engineSupports(r.engine, r.from, r.to),
+      `${r.slug}: engine ${r.engine} can't do ${pairKey}`,
+    );
+    assert(
+      r.title.length > 20 && r.title.length <= 58,
+      `${r.slug}: title length ${r.title.length}`,
+    );
+    assert(
+      r.metaDescription.length >= 110 && r.metaDescription.length <= 160,
+      `${r.slug}: meta length`,
+    );
+    assert(
+      r.secondaryKeywords.length >= 3 && r.secondaryKeywords.length <= 8,
+      `${r.slug}: 3–8 secondary keywords`,
+    );
+    assert(
+      r.semanticTerms.length >= 2 && r.semanticTerms.length <= 5,
+      `${r.slug}: 2–5 semantic terms`,
+    );
     assert(r.related.length >= 4 && r.related.length <= 8, `${r.slug}: 4–8 related`);
     assert(!r.related.includes(r.slug), `${r.slug}: relates to itself`);
   }
-  for (const r of records) for (const rel of r.related) assert(slugs.has(rel), `${r.slug}: unknown related "${rel}"`);
+  for (const r of records)
+    for (const rel of r.related) assert(slugs.has(rel), `${r.slug}: unknown related "${rel}"`);
 
   return records.map((r) => {
     const reverse = records.find((o) => o.from === r.to && o.to === r.from)?.slug;

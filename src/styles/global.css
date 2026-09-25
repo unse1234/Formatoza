@@ -17,8 +17,11 @@
   --fg-2: #4d4d4d;
   --fg-3: #666666; /* smallest text that still meets WCAG AA on --bg */
   --line: #8f8f8f; /* decorative only */
-  --accent: #0072f5;
-  --accent-strong: #005fcc;
+  /* DESIGN.md blue #0072F5 is used for focus rings; link text uses its darker
+     sibling #005FCC because #0072F5 is only 4.25:1 on #FAFAFA (WCAG AA needs 4.5:1). */
+  --accent: #005fcc;
+  --accent-strong: #004a9f;
+  --focus: #0072f5;
   --on-fg: #ffffff;
   --border-rgb: 0 0 0;
   --border: rgb(var(--border-rgb) / 0.08);
@@ -31,10 +34,16 @@
 
   --shadow-border: 0 0 0 1px var(--border);
   --shadow-small: var(--shadow-border), 0 2px 2px rgb(var(--border-rgb) / 0.04);
-  --shadow-medium: var(--shadow-border), 0 2px 2px rgb(var(--border-rgb) / 0.04), 0 8px 8px -8px rgb(var(--border-rgb) / 0.04);
-  --shadow-large: var(--shadow-border), 0 2px 2px rgb(var(--border-rgb) / 0.04), 0 8px 16px -4px rgb(var(--border-rgb) / 0.04);
-  --shadow-menu: var(--shadow-border), 0 1px 1px rgb(var(--border-rgb) / 0.02), 0 4px 8px -4px rgb(var(--border-rgb) / 0.04), 0 16px 24px -8px rgb(var(--border-rgb) / 0.06);
-  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  --shadow-medium:
+    var(--shadow-border), 0 2px 2px rgb(var(--border-rgb) / 0.04),
+    0 8px 8px -8px rgb(var(--border-rgb) / 0.04);
+  --shadow-large:
+    var(--shadow-border), 0 2px 2px rgb(var(--border-rgb) / 0.04),
+    0 8px 16px -4px rgb(var(--border-rgb) / 0.04);
+  --shadow-menu:
+    var(--shadow-border), 0 1px 1px rgb(var(--border-rgb) / 0.02),
+    0 4px 8px -4px rgb(var(--border-rgb) / 0.04), 0 16px 24px -8px rgb(var(--border-rgb) / 0.06);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus);
   --ease-swift: cubic-bezier(0.175, 0.885, 0.32, 1.1);
   --header-h: 64px;
   color-scheme: light;
@@ -52,6 +61,7 @@
     --line: #5c5c5c;
     --accent: #52a8ff;
     --accent-strong: #7cbcff;
+    --focus: #52a8ff;
     --on-fg: #0a0a0a;
     --border-rgb: 255 255 255;
     --border: rgb(255 255 255 / 0.1);
@@ -265,12 +275,16 @@
     padding: 0;
   }
 
+  /* Links are underlined so they're distinguishable without relying on color (WCAG 1.4.1). */
   .link {
     color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
   .link:hover {
-    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
 
   .chip {
@@ -371,10 +385,13 @@
   }
   .prose-fz a {
     color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
   }
   .prose-fz a:hover {
-    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
   .prose-fz ul,
   .prose-fz ol {
@@ -413,8 +430,13 @@
     background: none;
     font-size: inherit;
   }
+  .prose-fz .table-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+  }
   .prose-fz table {
     width: 100%;
+    min-width: max-content;
     font-size: 14px;
     border-collapse: collapse;
   }

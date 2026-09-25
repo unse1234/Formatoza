@@ -1,21 +1,35 @@
 import { ConversionError } from '../types';
-import { decodeEntities, normalizeMarkup, parseTimestamp, balanceTags, type Cue, type ParsedSubtitles } from './model';
+import {
+  decodeEntities,
+  normalizeMarkup,
+  parseTimestamp,
+  balanceTags,
+  type Cue,
+  type ParsedSubtitles,
+} from './model';
 
 const ARROW = /^\s*(\S+)\s+-{1,2}>\s+(\S+)(.*)$/;
 
 export type SubtitleFormat = 'srt' | 'vtt' | 'ass';
 
 export function detectSubtitleFormat(text: string): SubtitleFormat | null {
-  const head = text.replace(/^﻿/, '').trimStart().slice(0, 2000);
+  const head = text
+    .replace(/^\ufeff/, '')
+    .trimStart()
+    .slice(0, 2000);
   if (/^WEBVTT/.test(head)) return 'vtt';
   if (/^\[Script Info\]/im.test(head) || /^\[V4\+? Styles\]/im.test(head)) return 'ass';
-  if (/^\d+\s*\r?\n\s*\d{1,2}:\d{2}:\d{2}[,.]\d{1,3}\s*-->/m.test(head) || /\d{1,2}:\d{2}:\d{2},\d{1,3}\s*-->/.test(head)) return 'srt';
+  if (
+    /^\d+\s*\r?\n\s*\d{1,2}:\d{2}:\d{2}[,.]\d{1,3}\s*-->/m.test(head) ||
+    /\d{1,2}:\d{2}:\d{2},\d{1,3}\s*-->/.test(head)
+  )
+    return 'srt';
   return null;
 }
 
 function splitBlocks(text: string): string[][] {
   return text
-    .replace(/^﻿/, '')
+    .replace(/^\ufeff/, '')
     .replace(/\r\n?/g, '\n')
     .split(/\n[ \t]*\n+/)
     .map((b) => b.split('\n'))
@@ -24,8 +38,14 @@ function splitBlocks(text: string): string[][] {
 
 function wrongFormat(expected: SubtitleFormat, text: string): never {
   const actual = detectSubtitleFormat(text);
-  const hint = actual && actual !== expected ? ` It looks like a ${actual.toUpperCase()} file — use the ${actual.toUpperCase()} converter instead.` : '';
-  throw new ConversionError('MALFORMED_INPUT', `No ${expected.toUpperCase()} cues were found.${hint}`);
+  const hint =
+    actual && actual !== expected
+      ? ` It looks like a ${actual.toUpperCase()} file — use the ${actual.toUpperCase()} converter instead.`
+      : '';
+  throw new ConversionError(
+    'MALFORMED_INPUT',
+    `No ${expected.toUpperCase()} cues were found.${hint}`,
+  );
 }
 
 export function parseSrt(text: string): ParsedSubtitles {
@@ -46,7 +66,10 @@ export function parseSrt(text: string): ParsedSubtitles {
       skipped++;
       continue;
     }
-    let body = lines.slice(arrowIdx + 1).join('\n').trim();
+    let body = lines
+      .slice(arrowIdx + 1)
+      .join('\n')
+      .trim();
     const pos = /^\{\\an([1-9])\}/.exec(body);
     let settings: string | undefined;
     if (pos) {
@@ -59,7 +82,12 @@ export function parseSrt(text: string): ParsedSubtitles {
       notes.add('ASS-style override tags inside the SRT were removed.');
       body = body.replace(/\{\\[^}]*\}/g, '');
     }
-    cues.push({ start, end, text: normalizeMarkup(body, notes), ...(settings ? { settings } : {}) });
+    cues.push({
+      start,
+      end,
+      text: normalizeMarkup(body, notes),
+      ...(settings ? { settings } : {}),
+    });
   }
   if (cues.length === 0) wrongFormat('srt', text);
   if (skipped) notes.add(`${skipped} block(s) without a valid timestamp line were skipped.`);
@@ -70,7 +98,8 @@ export function parseVtt(text: string): ParsedSubtitles {
   if (!text.trim()) throw new ConversionError('EMPTY_INPUT', 'The subtitle file is empty.');
   const notes = new Set<string>();
   const blocks = splitBlocks(text);
-  if (!/^WEBVTT/.test(blocks[0]?.[0]?.trim() ?? '')) notes.add('The file did not start with the required “WEBVTT” line; it was read anyway.');
+  if (!/^WEBVTT/.test(blocks[0]?.[0]?.trim() ?? ''))
+    notes.add('The file did not start with the required “WEBVTT” line; it was read anyway.');
   const cues: Cue[] = [];
   for (const lines of blocks) {
     const first = lines[0]!.trim();
@@ -88,7 +117,15 @@ export function parseVtt(text: string): ParsedSubtitles {
     const end = m ? parseTimestamp(m[2]!) : null;
     if (start === null || end === null) continue;
     const settings = m?.[3]?.trim();
-    const body = decodeEntities(normalizeMarkup(lines.slice(arrowIdx + 1).join('\n').trim(), notes));
+    const body = decodeEntities(
+      normalizeMarkup(
+        lines
+          .slice(arrowIdx + 1)
+          .join('\n')
+          .trim(),
+        notes,
+      ),
+    );
     cues.push({ start, end, text: body, ...(settings ? { settings } : {}) });
   }
   if (cues.length === 0) wrongFormat('vtt', text);
@@ -138,21 +175,41 @@ export function assTextToMarkup(raw: string, notes: Set<string>): string {
         continue;
       }
       if (/^(k|K|kf|ko)\d/.test(t)) notes.add('Karaoke timing tags were removed.');
-      else if (/^(pos|move|an|a\d|org|fad|fade|frz|fr|t\(|clip|iclip|c|1c|2c|3c|4c|fn|fs|bord|shad|blur|be)/.test(t))
-        notes.add('Positioning, colors, fonts and animation tags were removed (only italic, bold and underline survive).');
+      else if (
+        /^(pos|move|an|a\d|org|fad|fade|frz|fr|t\(|clip|iclip|c|1c|2c|3c|4c|fn|fs|bord|shad|blur|be)/.test(
+          t,
+        )
+      )
+        notes.add(
+          'Positioning, colors, fonts and animation tags were removed (only italic, bold and underline survive).',
+        );
     }
   }
   emit(raw.slice(last));
-  text = text.replace(/\\N/g, '\n').replace(/\\n/g, '\n').replace(/\\h/g, ' ');
+  text = text.replace(/\\N/g, '\n').replace(/\\n/g, '\n').replace(/\\h/g, '\u00a0');
   return balanceTags(text.trim());
 }
 
 export function parseAss(text: string): ParsedSubtitles {
   if (!text.trim()) throw new ConversionError('EMPTY_INPUT', 'The subtitle file is empty.');
   const notes = new Set<string>();
-  const lines = text.replace(/^﻿/, '').replace(/\r\n?/g, '\n').split('\n');
+  const lines = text
+    .replace(/^\ufeff/, '')
+    .replace(/\r\n?/g, '\n')
+    .split('\n');
   let section = '';
-  let format: string[] = ['Layer', 'Start', 'End', 'Style', 'Name', 'MarginL', 'MarginR', 'MarginV', 'Effect', 'Text'];
+  let format: string[] = [
+    'Layer',
+    'Start',
+    'End',
+    'Style',
+    'Name',
+    'MarginL',
+    'MarginR',
+    'MarginV',
+    'Effect',
+    'Text',
+  ];
   const cues: Cue[] = [];
   let styles = 0;
   let comments = 0;
@@ -166,7 +223,10 @@ export function parseAss(text: string): ParsedSubtitles {
     if (section.includes('styles') && /^Style:/i.test(trimmed)) styles++;
     if (section !== 'events') continue;
     if (/^Format:/i.test(trimmed)) {
-      format = trimmed.slice(7).split(',').map((s) => s.trim());
+      format = trimmed
+        .slice(7)
+        .split(',')
+        .map((s) => s.trim());
       continue;
     }
     if (/^Comment:/i.test(trimmed)) {
@@ -184,7 +244,10 @@ export function parseAss(text: string): ParsedSubtitles {
     cues.push({ start, end, text: body });
   }
   if (cues.length === 0) wrongFormat('ass', text);
-  if (styles > 0) notes.add(`${styles} ASS style definition(s) were dropped; the target format has no named styles.`);
+  if (styles > 0)
+    notes.add(
+      `${styles} ASS style definition(s) were dropped; the target format has no named styles.`,
+    );
   if (comments > 0) notes.add(`${comments} commented-out line(s) were skipped.`);
   return { cues, notes };
 }

@@ -42,7 +42,7 @@ faq:
     a: >-
       HEIC uses a modern lossy video codec, while PNG stores pixels without discarding anything. Photographs contain
       lots of fine noise that lossless compression can't shrink much, so files grow considerably.
-  - q: "Will the PNG have a transparent background?"
+  - q: "Can a HEIC photo become a transparent PNG?"
     a: >-
       Only if the HEIC had transparency, which camera photos don't. PNG gives you the ability to add transparency later
       in an editor.

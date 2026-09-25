@@ -8,7 +8,9 @@ const client = (import.meta.env.PUBLIC_ADSENSE_CLIENT ?? '').trim();
 const CLIENT_PATTERN = /^ca-pub-\d{10,20}$/;
 
 if (client && !CLIENT_PATTERN.test(client)) {
-  console.warn(`[ads] PUBLIC_ADSENSE_CLIENT "${client}" is not a valid publisher ID (ca-pub-…); ads stay disabled.`);
+  console.warn(
+    `[ads] PUBLIC_ADSENSE_CLIENT "${client}" is not a valid publisher ID (ca-pub-…); ads stay disabled.`,
+  );
 }
 
 const slots: Record<AdPlacement, string> = {

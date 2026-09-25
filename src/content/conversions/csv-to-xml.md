@@ -41,7 +41,7 @@ faq:
     a: >-
       XML element names can't contain spaces, start with a digit or include most punctuation. “Unit price” becomes
       Unit_price and “2024 total” becomes _2024_total.
-  - q: "Are special characters escaped?"
+  - q: "What happens to &, < and > in my CSV values?"
     a: >-
       Yes. &, < and > in values are escaped as entities, and characters that are illegal in XML 1.0 (most control
       characters) are removed.

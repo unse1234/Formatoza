@@ -5,7 +5,18 @@
  */
 import type { EngineId, FormatId } from '~/lib/catalog/types';
 
-const IMAGE_INPUTS: FormatId[] = ['heic', 'avif', 'webp', 'jpg', 'png', 'svg', 'gif', 'bmp', 'tiff', 'ico'];
+const IMAGE_INPUTS: FormatId[] = [
+  'heic',
+  'avif',
+  'webp',
+  'jpg',
+  'png',
+  'svg',
+  'gif',
+  'bmp',
+  'tiff',
+  'ico',
+];
 const IMAGE_OUTPUTS: FormatId[] = ['jpg', 'png', 'webp'];
 const DATA_FORMATS: FormatId[] = ['csv', 'tsv', 'json', 'xml', 'yaml'];
 const SUBTITLE_INPUTS: FormatId[] = ['srt', 'vtt', 'ass'];

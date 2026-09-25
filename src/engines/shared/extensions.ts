@@ -6,7 +6,10 @@
 import type { FormatId } from '~/lib/catalog/types';
 
 export const FORMAT_EXTENSIONS: Record<FormatId, { ext: string[]; mime: string[] }> = {
-  heic: { ext: ['.heic', '.heif'], mime: ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'] },
+  heic: {
+    ext: ['.heic', '.heif'],
+    mime: ['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'],
+  },
   avif: { ext: ['.avif'], mime: ['image/avif'] },
   webp: { ext: ['.webp'], mime: ['image/webp'] },
   jpg: { ext: ['.jpg', '.jpeg', '.jfif', '.jpe'], mime: ['image/jpeg'] },
@@ -17,13 +20,19 @@ export const FORMAT_EXTENSIONS: Record<FormatId, { ext: string[]; mime: string[]
   tiff: { ext: ['.tif', '.tiff'], mime: ['image/tiff'] },
   ico: { ext: ['.ico'], mime: ['image/x-icon', 'image/vnd.microsoft.icon'] },
   pdf: { ext: ['.pdf'], mime: ['application/pdf'] },
-  docx: { ext: ['.docx'], mime: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'] },
+  docx: {
+    ext: ['.docx'],
+    mime: ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  },
   csv: { ext: ['.csv'], mime: ['text/csv'] },
   tsv: { ext: ['.tsv', '.tab'], mime: ['text/tab-separated-values'] },
   json: { ext: ['.json'], mime: ['application/json'] },
   xml: { ext: ['.xml'], mime: ['application/xml', 'text/xml'] },
   yaml: { ext: ['.yaml', '.yml'], mime: ['application/yaml', 'text/yaml'] },
-  xlsx: { ext: ['.xlsx'], mime: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] },
+  xlsx: {
+    ext: ['.xlsx'],
+    mime: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  },
   markdown: { ext: ['.md', '.markdown', '.mdown', '.mkd'], mime: ['text/markdown'] },
   html: { ext: ['.html', '.htm', '.xhtml'], mime: ['text/html'] },
   txt: { ext: ['.txt', '.text'], mime: ['text/plain'] },
@@ -47,7 +56,10 @@ export const OUTPUT_TYPE: Record<FormatId, { ext: string; mime: string }> = {
   tiff: { ext: '.tiff', mime: 'image/tiff' },
   ico: { ext: '.ico', mime: 'image/x-icon' },
   pdf: { ext: '.pdf', mime: 'application/pdf' },
-  docx: { ext: '.docx', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+  docx: {
+    ext: '.docx',
+    mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
   csv: { ext: '.csv', mime: 'text/csv' },
   tsv: { ext: '.tsv', mime: 'text/tab-separated-values' },
   json: { ext: '.json', mime: 'application/json' },
@@ -64,7 +76,22 @@ export const OUTPUT_TYPE: Record<FormatId, { ext: string; mime: string }> = {
   ass: { ext: '.ass', mime: 'text/x-ssa' },
 };
 
-const TEXT_FALLBACK: FormatId[] = ['base64', 'urlencoded', 'txt', 'tsv', 'json', 'csv', 'xml', 'yaml', 'markdown', 'html', 'srt', 'vtt', 'ass', 'svg'];
+const TEXT_FALLBACK: FormatId[] = [
+  'base64',
+  'urlencoded',
+  'txt',
+  'tsv',
+  'json',
+  'csv',
+  'xml',
+  'yaml',
+  'markdown',
+  'html',
+  'srt',
+  'vtt',
+  'ass',
+  'svg',
+];
 
 export function matchesFormat(file: { name: string; type: string }, format: FormatId): boolean {
   const name = file.name.toLowerCase();
@@ -73,6 +100,7 @@ export function matchesFormat(file: { name: string; type: string }, format: Form
   if (file.type && mime.includes(file.type.toLowerCase())) return true;
   // Pasted text and extensionless text files are accepted for text-based formats;
   // the parser gives a precise error if the content is wrong.
-  if (TEXT_FALLBACK.includes(format) && (!/\.[a-z0-9]{1,6}$/.test(name) || name.endsWith('.txt'))) return true;
+  if (TEXT_FALLBACK.includes(format) && (!/\.[a-z0-9]{1,6}$/.test(name) || name.endsWith('.txt')))
+    return true;
   return false;
 }

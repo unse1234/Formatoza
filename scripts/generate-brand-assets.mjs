@@ -8,20 +8,39 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
-const icon = (size, pad = 0) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${-pad} ${-pad} ${32 + 2 * pad} ${32 + 2 * pad}">
+const icon = (
+  size,
+  pad = 0,
+) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${-pad} ${-pad} ${32 + 2 * pad} ${32 + 2 * pad}">
 <rect x="${-pad}" y="${-pad}" width="${32 + 2 * pad}" height="${32 + 2 * pad}" fill="#fafafa"/>
 <rect width="32" height="32" rx="7" fill="#171717"/>
 <path d="M9.5 9h13M9.5 16h7.5M9.5 9v14" stroke="#fafafa" stroke-width="2.6" stroke-linecap="round" fill="none"/>
 <path d="M18.5 12.5 22 16l-3.5 3.5" stroke="#fafafa" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
-const bare = (size) => icon(size).replace(/<rect x="[^"]+" y="[^"]+" width="[^"]+" height="[^"]+" fill="#fafafa"\/>\n/, '');
+const bare = (size) =>
+  icon(size).replace(
+    /<rect x="[^"]+" y="[^"]+" width="[^"]+" height="[^"]+" fill="#fafafa"\/>\n/,
+    '',
+  );
 
-await sharp(Buffer.from(bare(512))).png().toFile('public/icon-512.png');
-await sharp(Buffer.from(bare(192))).png().toFile('public/icon-192.png');
-await sharp(Buffer.from(icon(180, 3))).png().toFile('public/apple-touch-icon.png');
+await sharp(Buffer.from(bare(512)))
+  .png()
+  .toFile('public/icon-512.png');
+await sharp(Buffer.from(bare(192)))
+  .png()
+  .toFile('public/icon-192.png');
+await sharp(Buffer.from(icon(180, 3)))
+  .png()
+  .toFile('public/apple-touch-icon.png');
 
 // favicon.ico with PNG-encoded 16/32/48 entries.
 const sizes = [16, 32, 48];
-const pngs = await Promise.all(sizes.map((s) => sharp(Buffer.from(bare(s))).png().toBuffer()));
+const pngs = await Promise.all(
+  sizes.map((s) =>
+    sharp(Buffer.from(bare(s)))
+      .png()
+      .toBuffer(),
+  ),
+);
 const header = Buffer.alloc(6 + 16 * sizes.length);
 header.writeUInt16LE(0, 0);
 header.writeUInt16LE(1, 2);
@@ -40,7 +59,8 @@ sizes.forEach((s, i) => {
 writeFileSync('public/favicon.ico', Buffer.concat([header, ...pngs]));
 
 // Open Graph image.
-const font = (f) => `data:font/woff2;base64,${readFileSync(resolve(root, 'node_modules/@fontsource-variable', f)).toString('base64')}`;
+const font = (f) =>
+  `data:font/woff2;base64,${readFileSync(resolve(root, 'node_modules/@fontsource-variable', f)).toString('base64')}`;
 const html = `<!doctype html><html><head><style>
 @font-face{font-family:G;src:url(${font('geist/files/geist-latin-wght-normal.woff2')}) format('woff2');font-weight:100 900}
 @font-face{font-family:M;src:url(${font('geist-mono/files/geist-mono-latin-wght-normal.woff2')}) format('woff2');font-weight:100 900}

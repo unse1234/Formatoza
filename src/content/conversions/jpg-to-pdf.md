@@ -47,7 +47,7 @@ faq:
   - q: "Is there a limit on the number of images?"
     a: >-
       Up to 100 images of up to 60 MB each per PDF. Very large sets may take a while on older phones.
-  - q: "Are my photos uploaded?"
+  - q: "Are my photos uploaded when the PDF is created?"
     a: >-
       No. The PDF is built entirely inside your browser tab.
 ---

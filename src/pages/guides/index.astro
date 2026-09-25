@@ -5,7 +5,9 @@ import { getCollection } from 'astro:content';
 import { CATEGORIES } from '~/lib/catalog/registry';
 import { breadcrumbList, graph, organization, website } from '~/lib/seo/jsonld';
 
-const guides = (await getCollection('guides')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const guides = (await getCollection('guides')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
 const crumbs = [
   { name: 'Home', path: '/' },
   { name: 'Guides', path: '/guides/' },
@@ -15,7 +17,8 @@ const crumbs = [
 <BaseLayout
   meta={{
     title: 'File Format Guides — Images, PDF, Data, Subtitles',
-    description: 'Practical guides to HEIC, WebP, AVIF, PDF, CSV, JSON, XML, YAML, Base64, Markdown and subtitle formats: how they work and how to convert them safely.',
+    description:
+      'Practical guides to HEIC, WebP, AVIF, PDF, CSV, JSON, XML, YAML, Base64, Markdown and subtitle formats: how they work and how to convert them safely.',
     path: '/guides/',
   }}
   jsonLd={graph(organization(), website(), breadcrumbList(crumbs))}
@@ -25,22 +28,25 @@ const crumbs = [
     <header class="mt-8 max-w-3xl">
       <h1 class="t-display">Guides</h1>
       <p class="mt-5 text-lg leading-relaxed text-fg-2">
-        How file formats work, why conversions sometimes lose things, and how to pick the right target — written alongside the converters, with
-        the same facts.
+        How file formats work, why conversions sometimes lose things, and how to pick the right
+        target — written alongside the converters, with the same facts.
       </p>
     </header>
     <ul class="mt-10 grid gap-3 md:grid-cols-2">
-      {
-        guides.map((g) => (
-          <li>
-            <a href={`/guides/${g.id}/`} class="group flex h-full flex-col gap-2 rounded-lg bg-surface p-6 shadow-border hover:shadow-large">
-              <span class="t-eyebrow">{CATEGORIES[g.data.category].name}</span>
-              <h2 class="text-lg font-semibold tracking-[-0.02em] group-hover:text-accent">{g.data.h1}</h2>
-              <p class="text-sm leading-relaxed text-fg-2">{g.data.summary}</p>
-            </a>
-          </li>
-        ))
-      }
+      {guides.map((g) => (
+        <li>
+          <a
+            href={`/guides/${g.id}/`}
+            class="group flex h-full flex-col gap-2 rounded-lg bg-surface p-6 shadow-border hover:shadow-large"
+          >
+            <span class="t-eyebrow">{CATEGORIES[g.data.category].name}</span>
+            <h2 class="text-lg font-semibold tracking-[-0.02em] group-hover:text-accent">
+              {g.data.h1}
+            </h2>
+            <p class="text-sm leading-relaxed text-fg-2">{g.data.summary}</p>
+          </a>
+        </li>
+      ))}
     </ul>
   </div>
 </BaseLayout>

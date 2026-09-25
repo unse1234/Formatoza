@@ -65,19 +65,32 @@ export function jpegOrientation(bytes: Uint8Array): number {
 }
 
 /** Longest-side downscale; never upscales. */
-export function fitWithin(width: number, height: number, maxSide: number): { width: number; height: number } {
+export function fitWithin(
+  width: number,
+  height: number,
+  maxSide: number,
+): { width: number; height: number } {
   if (!maxSide || Math.max(width, height) <= maxSide) return { width, height };
   const s = maxSide / Math.max(width, height);
   return { width: Math.max(1, Math.round(width * s)), height: Math.max(1, Math.round(height * s)) };
 }
 
 /** Scales down to respect a browser's canvas area / dimension limits. */
-export function fitCanvasLimits(width: number, height: number, maxArea: number, maxDim: number): { width: number; height: number; scaled: boolean } {
+export function fitCanvasLimits(
+  width: number,
+  height: number,
+  maxArea: number,
+  maxDim: number,
+): { width: number; height: number; scaled: boolean } {
   let s = 1;
   if (width * height > maxArea) s = Math.sqrt(maxArea / (width * height));
   if (Math.max(width, height) * s > maxDim) s = maxDim / Math.max(width, height);
   if (s >= 1) return { width, height, scaled: false };
-  return { width: Math.max(1, Math.floor(width * s)), height: Math.max(1, Math.floor(height * s)), scaled: true };
+  return {
+    width: Math.max(1, Math.floor(width * s)),
+    height: Math.max(1, Math.floor(height * s)),
+    scaled: true,
+  };
 }
 
 export interface SvgSize {
@@ -92,15 +105,29 @@ function length(v: string | null | undefined): number | null {
   if (!m) return null;
   const n = Number(m[1]);
   const unit = (m[2] ?? 'px').toLowerCase();
-  const factor: Record<string, number> = { px: 1, pt: 4 / 3, pc: 16, mm: 96 / 25.4, cm: 96 / 2.54, in: 96 };
+  const factor: Record<string, number> = {
+    px: 1,
+    pt: 4 / 3,
+    pc: 16,
+    mm: 96 / 25.4,
+    cm: 96 / 2.54,
+    in: 96,
+  };
   return Number.isFinite(n) && n > 0 ? n * factor[unit]! : null;
 }
 
 /** Intrinsic SVG size from width/height/viewBox attributes (percentages ignored). */
-export function svgIntrinsicSize(attrs: { width?: string | null; height?: string | null; viewBox?: string | null }): SvgSize {
+export function svgIntrinsicSize(attrs: {
+  width?: string | null;
+  height?: string | null;
+  viewBox?: string | null;
+}): SvgSize {
   const w = length(attrs.width);
   const h = length(attrs.height);
-  const vb = attrs.viewBox?.trim().split(/[\s,]+/).map(Number);
+  const vb = attrs.viewBox
+    ?.trim()
+    .split(/[\s,]+/)
+    .map(Number);
   const vbOk = vb && vb.length === 4 && vb[2]! > 0 && vb[3]! > 0;
   if (w && h) return { width: w, height: h, fromViewBox: false };
   if (vbOk) {

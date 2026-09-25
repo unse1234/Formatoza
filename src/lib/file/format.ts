@@ -9,7 +9,10 @@ export function formatBytes(bytes: number): string {
     i++;
   }
   const digits = v >= 100 || Number.isInteger(v) ? 0 : v >= 10 ? 1 : 2;
-  return `${v.toFixed(digits).replace(/\.0+$/, '')} ${units[i]}`;
+  return `${v
+    .toFixed(digits)
+    .replace(/(\.\d*?)0+$/, '$1')
+    .replace(/\.$/, '')} ${units[i]}`;
 }
 
 export function pluralize(n: number, one: string, many = `${one}s`): string {

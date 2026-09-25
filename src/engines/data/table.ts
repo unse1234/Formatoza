@@ -77,7 +77,10 @@ export interface RecordOptions {
 }
 
 /** Table with header → array of objects. */
-export function tableToRecords(table: Table, opts: RecordOptions): { records: Record<string, unknown>[]; conflicts: string[] } {
+export function tableToRecords(
+  table: Table,
+  opts: RecordOptions,
+): { records: Record<string, unknown>[]; conflicts: string[] } {
   const conflicts = new Set<string>();
   const records = table.rows.map((row) => {
     const obj: Record<string, unknown> = {};
@@ -101,13 +104,17 @@ export function tableToRecords(table: Table, opts: RecordOptions): { records: Re
   return { records, conflicts: [...conflicts] };
 }
 
-/** Table without header → array of arrays. */
+/** Table without a header row → array of arrays (the generated column names are not data). */
 export function tableToArrays(table: Table, typed: boolean): Scalar[][] {
-  const all = [table.columns, ...table.rows];
-  return all.map((r) => r.map((v) => (typed && typeof v === 'string' ? typedValue(v) : v)));
+  return table.rows.map((r) => r.map((v) => (typed && typeof v === 'string' ? typedValue(v) : v)));
 }
 
-function flattenInto(out: Record<string, Scalar>, value: unknown, prefix: string, flatten: boolean): void {
+function flattenInto(
+  out: Record<string, Scalar>,
+  value: unknown,
+  prefix: string,
+  flatten: boolean,
+): void {
   if (isPlainObject(value) && flatten) {
     const keys = Object.keys(value);
     if (keys.length === 0 && prefix) out[prefix] = '';
@@ -118,7 +125,8 @@ function flattenInto(out: Record<string, Scalar>, value: unknown, prefix: string
   if (value === null || value === undefined) out[key] = null;
   else if (value instanceof Date) out[key] = value.toISOString();
   else if (typeof value === 'object') out[key] = JSON.stringify(value);
-  else if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string') out[key] = value;
+  else if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string')
+    out[key] = value;
   else out[key] = String(value);
 }
 
@@ -139,23 +147,32 @@ export function findRecords(value: unknown): { records: unknown[]; path: string 
       continue;
     }
     if (isPlainObject(v) && depth < 6)
-      for (const [k, child] of Object.entries(v)) queue.push({ v: child, path: path ? `${path}.${k}` : k, depth: depth + 1 });
+      for (const [k, child] of Object.entries(v))
+        queue.push({ v: child, path: path ? `${path}.${k}` : k, depth: depth + 1 });
   }
   if (best) return best;
   // No array anywhere: a single record. If the object is a single-key wrapper
   // around an object (e.g. an XML root element), unwrap it.
   if (isPlainObject(value)) {
     const keys = Object.keys(value);
-    if (keys.length === 1 && isPlainObject(value[keys[0]!])) return { records: [value[keys[0]!]], path: keys[0]! };
+    if (keys.length === 1 && isPlainObject(value[keys[0]!]))
+      return { records: [value[keys[0]!]], path: keys[0]! };
     return { records: [value], path: '' };
   }
   return { records: [value], path: '' };
 }
 
 /** Tree → table: column union in first-seen order. Arrays of arrays are treated as raw rows. */
-export function treeToTable(value: unknown, flatten: boolean): { table: Table; recordPath: string } {
+export function treeToTable(
+  value: unknown,
+  flatten: boolean,
+): { table: Table; recordPath: string } {
   const { records, path } = findRecords(value);
-  if (records.length === 0) throw new ConversionError('EMPTY_INPUT', 'The data contains an empty list — there are no records to convert.');
+  if (records.length === 0)
+    throw new ConversionError(
+      'EMPTY_INPUT',
+      'The data contains an empty list — there are no records to convert.',
+    );
   if (records.every(Array.isArray)) {
     const rows = records as unknown[][];
     const width = Math.max(...rows.map((r) => r.length));
@@ -165,8 +182,16 @@ export function treeToTable(value: unknown, flatten: boolean): { table: Table; r
       return o['v'] ?? null;
     };
     const [head = [], ...rest] = rows;
-    const columns = normalizeHeaders(Array.from({ length: width }, (_, i) => String(head[i] ?? '')));
-    return { table: { columns, rows: rest.map((r) => Array.from({ length: width }, (_, i) => toScalar(r[i]))) }, recordPath: path };
+    const columns = normalizeHeaders(
+      Array.from({ length: width }, (_, i) => String(head[i] ?? '')),
+    );
+    return {
+      table: {
+        columns,
+        rows: rest.map((r) => Array.from({ length: width }, (_, i) => toScalar(r[i]))),
+      },
+      recordPath: path,
+    };
   }
   const flat = records.map((r) => {
     const o: Record<string, Scalar> = {};
@@ -181,7 +206,10 @@ export function treeToTable(value: unknown, flatten: boolean): { table: Table; r
         seen.add(k);
         columns.push(k);
       }
-  return { table: { columns, rows: flat.map((o) => columns.map((c) => (c in o ? o[c]! : null))) }, recordPath: path };
+  return {
+    table: { columns, rows: flat.map((o) => columns.map((c) => (c in o ? o[c]! : null))) },
+    recordPath: path,
+  };
 }
 
 export function scalarToString(v: Scalar): string {

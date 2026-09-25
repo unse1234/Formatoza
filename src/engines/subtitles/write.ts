@@ -14,7 +14,9 @@ export function writeSrt(cues: Cue[]): string {
 function escapeVtt(text: string): string {
   return text
     .split(/(<\/?[ibu]>)/)
-    .map((part, i) => (i % 2 ? part : part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')))
+    .map((part, i) =>
+      i % 2 ? part : part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+    )
     .join('');
 }
 
@@ -25,7 +27,7 @@ export function writeVtt(cues: Cue[]): string {
       // A cue line must not be blank inside the payload; replace empty lines with a space-less NBSP.
       const text = escapeVtt(c.text)
         .split('\n')
-        .map((l) => (l.trim() ? l : ' '))
+        .map((l) => (l.trim() ? l : '\u00a0'))
         .join('\n');
       return `${formatTimestamp(c.start, 'vtt')} --> ${formatTimestamp(c.end, 'vtt')}${settings}\n${text}`;
     })
@@ -90,14 +92,17 @@ export function writeTxt(cues: Cue[], o: TxtOptions): string {
   const plain = (c: Cue) =>
     stripMarkup(c.text)
       .split('\n')
-      .map((l) => l.replace(/ /g, ' ').trim())
+      .map((l) => l.replace(/\u00a0/g, ' ').trim())
       .filter(Boolean);
 
   if (o.timestamps) {
     return (
       cues
         .map((c) => `[${formatTimestamp(c.start, 'txt')}] ${plain(c).join(' ')}`)
-        .filter((l, i, all) => !o.dedupe || l.slice(l.indexOf(']')) !== all[i - 1]?.slice(all[i - 1]!.indexOf(']')))
+        .filter(
+          (l, i, all) =>
+            !o.dedupe || l.slice(l.indexOf(']')) !== all[i - 1]?.slice(all[i - 1]!.indexOf(']')),
+        )
         .join('\n') + '\n'
     );
   }

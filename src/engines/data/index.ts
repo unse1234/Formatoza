@@ -6,7 +6,13 @@
  */
 import { matchesFormat } from '../shared/extensions';
 import { validateFiles } from '../shared/engine-utils';
-import { ConversionError, type ConversionIssue, type ConversionResult, type ConverterEngine, type ProgressUpdate } from '../types';
+import {
+  ConversionError,
+  type ConversionIssue,
+  type ConversionResult,
+  type ConverterEngine,
+  type ProgressUpdate,
+} from '../types';
 
 type WorkerMessage =
   | { id: number; type: 'progress'; progress: ProgressUpdate }
@@ -17,7 +23,10 @@ let worker: Worker | undefined;
 let nextId = 1;
 
 function getWorker(): Worker {
-  worker ??= new Worker(new URL('./data.worker.ts', import.meta.url), { type: 'module', name: 'formatoza-data' });
+  worker ??= new Worker(new URL('./data.worker.ts', import.meta.url), {
+    type: 'module',
+    name: 'formatoza-data',
+  });
   return worker;
 }
 
@@ -55,13 +64,24 @@ export const dataEngine: ConverterEngine = {
           resolve(e.data.result);
         } else {
           cleanup();
-          reject(new ConversionError(e.data.issue.code === 'WARNING' ? 'INTERNAL' : e.data.issue.code, e.data.issue.message));
+          reject(
+            new ConversionError(
+              e.data.issue.code === 'WARNING' ? 'INTERNAL' : e.data.issue.code,
+              e.data.issue.message,
+            ),
+          );
         }
       };
       const onError = (e: ErrorEvent) => {
         cleanup();
         reset();
-        reject(new ConversionError('INTERNAL', e.message || 'The conversion worker stopped (the file may be too large for this device).'));
+        reject(
+          new ConversionError(
+            'INTERNAL',
+            e.message ||
+              'The conversion worker stopped (the file may be too large for this device).',
+          ),
+        );
       };
       const onAbort = () => {
         cleanup();

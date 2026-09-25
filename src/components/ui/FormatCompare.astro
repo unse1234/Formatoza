@@ -6,31 +6,52 @@ interface Props {
 }
 const { source, target } = Astro.props;
 // Rows: the union of both formats' kinds, in the source kind's order.
-const labels: Record<string, string> = { ...TRAIT_LABELS[target.kind], ...TRAIT_LABELS[source.kind] };
-const rows = Object.entries(labels).filter(([k]) => (source.traits as Record<string, string | undefined>)[k] || (target.traits as Record<string, string | undefined>)[k]);
-const val = (f: FormatInfo, k: string) => (f.traits as Record<string, string | undefined>)[k] ?? '—';
+const labels: Record<string, string> = {
+  ...TRAIT_LABELS[target.kind],
+  ...TRAIT_LABELS[source.kind],
+};
+const rows = Object.entries(labels).filter(
+  ([k]) =>
+    (source.traits as Record<string, string | undefined>)[k] ||
+    (target.traits as Record<string, string | undefined>)[k],
+);
+const val = (f: FormatInfo, k: string) =>
+  (f.traits as Record<string, string | undefined>)[k] ?? '—';
 ---
 
-<div class="overflow-x-auto rounded-lg bg-surface shadow-border">
+<div
+  class="overflow-x-auto rounded-lg bg-surface shadow-border"
+  tabindex="0"
+  role="region"
+  aria-label={`${source.name} and ${target.name} compared (scrolls horizontally)`}
+>
   <table class="w-full min-w-[34rem] text-left text-sm">
-    <caption class="sr-only">{source.name} compared with {target.name}</caption>
+    <caption class="sr-only">
+      {source.name}compared with{target.name}
+    </caption>
     <thead>
       <tr class="shadow-[0_1px_0_0_var(--border)]">
-        <th scope="col" class="w-40 px-4 py-3 font-medium text-fg-3"><span class="sr-only">Property</span></th>
-        <th scope="col" class="px-4 py-3 font-mono text-[13px] font-medium text-fg">{source.name}</th>
-        <th scope="col" class="px-4 py-3 font-mono text-[13px] font-medium text-fg">{target.name}</th>
+        <th scope="col" class="w-40 px-4 py-3 font-medium text-fg-3">
+          <span class="sr-only">Property</span>
+        </th>
+        <th scope="col" class="px-4 py-3 font-mono text-[13px] font-medium text-fg">
+          {source.name}
+        </th>
+        <th scope="col" class="px-4 py-3 font-mono text-[13px] font-medium text-fg">
+          {target.name}
+        </th>
       </tr>
     </thead>
     <tbody class="divide-y divide-[var(--border)]">
-      {
-        rows.map(([k, label]) => (
-          <tr>
-            <th scope="row" class="px-4 py-3 align-top font-medium text-fg-2">{label}</th>
-            <td class="px-4 py-3 align-top text-fg-2">{val(source, k)}</td>
-            <td class="px-4 py-3 align-top text-fg-2">{val(target, k)}</td>
-          </tr>
-        ))
-      }
+      {rows.map(([k, label]) => (
+        <tr>
+          <th scope="row" class="px-4 py-3 align-top font-medium text-fg-2">
+            {label}
+          </th>
+          <td class="px-4 py-3 align-top text-fg-2">{val(source, k)}</td>
+          <td class="px-4 py-3 align-top text-fg-2">{val(target, k)}</td>
+        </tr>
+      ))}
     </tbody>
   </table>
 </div>

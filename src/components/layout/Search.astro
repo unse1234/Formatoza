@@ -13,9 +13,15 @@ const hero = variant === 'hero';
 ---
 
 <div class:list={['fz-search relative w-full', hero ? 'max-w-xl' : 'max-w-xs']} data-search>
-  <label for={`${id}-input`} class="sr-only">Search converters</label>
+  <label for={`${id}-input`} class="sr-only">
+    Search converters
+  </label>
   <div class="relative">
-    <Icon name="search" size={hero ? 18 : 15} class={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-fg-3 ${hero ? 'left-4' : 'left-3'}`} />
+    <Icon
+      name="search"
+      size={hero ? 18 : 15}
+      class={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-fg-3 ${hero ? 'left-4' : 'left-3'}`}
+    />
     <input
       id={`${id}-input`}
       type="search"
@@ -25,17 +31,25 @@ const hero = variant === 'hero';
       aria-autocomplete="list"
       autocomplete="off"
       spellcheck="false"
-      placeholder={hero ? 'Search 60+ converters — try “heic”, “csv json” or “subtitles”' : 'Search converters'}
-      class:list={['field', hero ? '!h-12 !rounded-lg !pl-11 !pr-4 !text-base shadow-small' : '!h-9 !pl-9 !pr-9 !text-sm']}
+      placeholder={
+        hero ? 'Search 60+ converters — try “heic”, “csv json” or “subtitles”' : 'Search converters'
+      }
+      class:list={[
+        'field',
+        hero
+          ? '!h-12 !rounded-lg !pl-11 !pr-4 !text-base shadow-small'
+          : '!h-9 !pl-9 !pr-9 !text-sm',
+      ]}
       data-search-input
     />
-    {
-      !hero && (
-        <kbd class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded px-1.5 font-mono text-[11px] text-fg-3 shadow-border md:block" aria-hidden="true">
-          /
-        </kbd>
-      )
-    }
+    {!hero && (
+      <kbd
+        class="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded px-1.5 font-mono text-[11px] text-fg-3 shadow-border md:block"
+        aria-hidden="true"
+      >
+        /
+      </kbd>
+    )}
   </div>
   <ul
     id={`${id}-list`}
@@ -43,8 +57,7 @@ const hero = variant === 'hero';
     aria-label="Matching converters"
     class="animate-fade absolute top-full right-0 left-0 z-50 mt-2 hidden max-h-[min(24rem,70vh)] overflow-auto rounded-lg bg-surface p-1 shadow-menu"
     data-search-list
-  >
-  </ul>
+  ></ul>
 </div>
 
 <script>
@@ -82,7 +95,8 @@ const hero = variant === 'hero';
     if (title.startsWith(q)) s += 10;
     if (title.includes(q)) s += 5;
     // Prefer order-matching "x to y" queries.
-    if (tokens.length >= 2 && title.indexOf(tokens[0]!) < title.indexOf(tokens[tokens.length - 1]!)) s += 3;
+    if (tokens.length >= 2 && title.indexOf(tokens[0]!) < title.indexOf(tokens[tokens.length - 1]!))
+      s += 3;
     tokens.forEach((t) => title.split(' ').includes(t) && (s += 2));
     return s;
   }
@@ -110,7 +124,10 @@ const hero = variant === 'hero';
     };
     const render = () => {
       list.replaceChildren();
-      const q = norm(input.value).replace(/\bto\b/g, ' ').replace(/\s+/g, ' ').trim();
+      const q = norm(input.value)
+        .replace(/\bto\b/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
       if (!q) return close();
       loadIndex().then((index) => {
         const tokens = q.split(' ').filter(Boolean);
@@ -133,7 +150,8 @@ const hero = variant === 'hero';
           li.id = `${list.id}-${i}`;
           li.setAttribute('role', 'option');
           li.setAttribute('aria-selected', 'false');
-          li.className = 'group cursor-pointer rounded-md px-3 py-2 aria-selected:bg-hover hover:bg-hover';
+          li.className =
+            'group cursor-pointer rounded-md px-3 py-2 aria-selected:bg-hover hover:bg-hover';
           const a = document.createElement('a');
           a.href = r.p;
           a.tabIndex = -1;
@@ -189,7 +207,9 @@ const hero = variant === 'hero';
     if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
     const t = e.target as HTMLElement | null;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    const input = [...document.querySelectorAll<HTMLInputElement>('[data-search-input]')].find((i) => i.offsetParent !== null);
+    const input = [...document.querySelectorAll<HTMLInputElement>('[data-search-input]')].find(
+      (i) => i.offsetParent !== null,
+    );
     if (input) {
       e.preventDefault();
       input.focus();

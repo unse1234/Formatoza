@@ -2,18 +2,49 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Search from '~/components/layout/Search.astro';
 import { getConversionMeta } from '~/lib/catalog/registry';
-const popular = ['heic-to-jpg', 'webp-to-png', 'jpg-to-pdf', 'pdf-to-png', 'csv-to-json', 'srt-to-vtt'].map(getConversionMeta);
+const popular = [
+  'heic-to-jpg',
+  'webp-to-png',
+  'jpg-to-pdf',
+  'pdf-to-png',
+  'csv-to-json',
+  'srt-to-vtt',
+].map(getConversionMeta);
 ---
 
-<BaseLayout meta={{ title: 'Page not found', description: 'The page you were looking for does not exist. Search for a converter or pick a popular one.', path: '/404/', noindex: true }} hideHeaderSearch>
+<BaseLayout
+  meta={{
+    title: 'Page not found',
+    description:
+      'The page you were looking for does not exist. Search for a converter or pick a popular one.',
+    path: '/404/',
+    noindex: true,
+  }}
+  hideHeaderSearch
+>
   <div class="container-page max-w-2xl py-20 text-center sm:py-28">
     <p class="font-mono text-sm text-fg-3">404</p>
     <h1 class="t-display mt-3">This page doesn't exist</h1>
-    <p class="mt-5 text-lg text-fg-2">The address may be mistyped or the page may have moved. Try searching for the conversion you need.</p>
-    <div class="mt-8 flex justify-center text-left"><Search variant="hero" id="notfound-search" /></div>
+    <p class="mt-5 text-lg text-fg-2">
+      The address may be mistyped or the page may have moved. Try searching for the conversion you
+      need.
+    </p>
+    <div class="mt-8 flex justify-center text-left">
+      <Search variant="hero" id="notfound-search" />
+    </div>
     <ul class="mt-8 flex flex-wrap justify-center gap-2" aria-label="Popular converters">
-      {popular.map((c) => <li><a href={c.path} class="chip h-8 px-3 hover:bg-hover hover:text-fg">{c.h1.replace(/ Converter$/, '')}</a></li>)}
+      {popular.map((c) => (
+        <li>
+          <a href={c.path} class="chip h-8 px-3 hover:bg-hover hover:text-fg">
+            {c.h1.replace(/ Converter$/, '')}
+          </a>
+        </li>
+      ))}
     </ul>
-    <p class="mt-10"><a class="link" href="/">Back to all converters</a></p>
+    <p class="mt-10">
+      <a class="link" href="/">
+        Back to all converters
+      </a>
+    </p>
   </div>
 </BaseLayout>

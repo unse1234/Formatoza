@@ -3,8 +3,19 @@
  * WebP); these checks let engines give accurate errors and pick decoders.
  */
 export type SniffedType =
-  | 'jpg' | 'png' | 'gif' | 'webp' | 'bmp' | 'tiff' | 'ico' | 'heic' | 'avif'
-  | 'pdf' | 'zip' | 'svg' | 'unknown';
+  | 'jpg'
+  | 'png'
+  | 'gif'
+  | 'webp'
+  | 'bmp'
+  | 'tiff'
+  | 'ico'
+  | 'heic'
+  | 'avif'
+  | 'pdf'
+  | 'zip'
+  | 'svg'
+  | 'unknown';
 
 function ascii(bytes: Uint8Array, start: number, len: number): string {
   let s = '';
@@ -19,7 +30,10 @@ export function sniffBytes(b: Uint8Array): SniffedType {
   if (ascii(b, 0, 4) === 'GIF8') return 'gif';
   if (ascii(b, 0, 4) === 'RIFF' && ascii(b, 8, 4) === 'WEBP') return 'webp';
   if (ascii(b, 0, 2) === 'BM') return 'bmp';
-  if ((b[0] === 0x49 && b[1] === 0x49 && b[2] === 0x2a && b[3] === 0) || (b[0] === 0x4d && b[1] === 0x4d && b[2] === 0 && b[3] === 0x2a))
+  if (
+    (b[0] === 0x49 && b[1] === 0x49 && b[2] === 0x2a && b[3] === 0) ||
+    (b[0] === 0x4d && b[1] === 0x4d && b[2] === 0 && b[3] === 0x2a)
+  )
     return 'tiff';
   if (b[0] === 0 && b[1] === 0 && b[2] === 1 && b[3] === 0) return 'ico';
   if (ascii(b, 0, 5) === '%PDF-') return 'pdf';
@@ -29,8 +43,12 @@ export function sniffBytes(b: Uint8Array): SniffedType {
     if (/avif|avis/.test(brands)) return 'avif';
     if (/heic|heix|heim|heis|hevc|hevx|mif1|msf1/.test(brands)) return 'heic';
   }
-  const head = new TextDecoder('utf-8').decode(b.subarray(0, 1024)).replace(/^﻿/, '').trimStart();
-  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/i.test(head)) return 'svg';
+  const head = new TextDecoder('utf-8')
+    .decode(b.subarray(0, 1024))
+    .replace(/^\ufeff/, '')
+    .trimStart();
+  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/i.test(head))
+    return 'svg';
   return 'unknown';
 }
 

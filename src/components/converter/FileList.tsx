@@ -13,10 +13,19 @@ interface Props {
 
 export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Props) {
   return (
-    <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-lg bg-surface shadow-border" aria-label="Selected files">
+    <ul
+      className="divide-y divide-[var(--border)] overflow-hidden rounded-lg bg-surface shadow-border"
+      aria-label="Selected files"
+    >
       {items.map((item, i) => (
-        <li key={item.id} className="animate-fade flex items-center gap-3 px-3 py-2.5 sm:px-4" data-testid="file-item">
-          {orderMatters && <span className="w-5 shrink-0 text-right font-mono text-xs text-fg-3">{i + 1}</span>}
+        <li
+          key={item.id}
+          className="animate-fade flex items-center gap-3 px-3 py-2.5 sm:px-4"
+          data-testid="file-item"
+        >
+          {orderMatters && (
+            <span className="w-5 shrink-0 text-right font-mono text-xs text-fg-3">{i + 1}</span>
+          )}
           <FilePreview file={item.file} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-fg" title={item.file.name}>
@@ -37,15 +46,33 @@ export function FileList({ items, orderMatters, disabled, onRemove, onMove }: Pr
           <div className="flex shrink-0 items-center gap-0.5">
             {orderMatters && items.length > 1 && (
               <>
-                <button type="button" className="btn btn-ghost btn-icon" onClick={() => onMove(item.id, -1)} disabled={disabled || i === 0} aria-label={`Move ${item.file.name} up`}>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-icon"
+                  onClick={() => onMove(item.id, -1)}
+                  disabled={disabled || i === 0}
+                  aria-label={`Move ${item.file.name} up`}
+                >
                   <ArrowUpIcon />
                 </button>
-                <button type="button" className="btn btn-ghost btn-icon" onClick={() => onMove(item.id, 1)} disabled={disabled || i === items.length - 1} aria-label={`Move ${item.file.name} down`}>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-icon"
+                  onClick={() => onMove(item.id, 1)}
+                  disabled={disabled || i === items.length - 1}
+                  aria-label={`Move ${item.file.name} down`}
+                >
                   <ArrowDownIcon />
                 </button>
               </>
             )}
-            <button type="button" className="btn btn-ghost btn-icon" onClick={() => onRemove(item.id)} disabled={disabled} aria-label={`Remove ${item.file.name}`}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={() => onRemove(item.id)}
+              disabled={disabled}
+              aria-label={`Remove ${item.file.name}`}
+            >
               <XIcon />
             </button>
           </div>

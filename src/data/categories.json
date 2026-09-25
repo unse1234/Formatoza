@@ -63,7 +63,7 @@
     "path": "developer-converters",
     "name": "Developer converters",
     "navLabel": "Developer",
-    "title": "Developer Converters — Markdown, HTML, Base64 & URL Encoding | Formatoza",
+    "title": "Developer Tools — Markdown, HTML, Base64 & URL Encoding | Formatoza",
     "metaDescription": "Convert Markdown to HTML and back, strip HTML to plain text, encode or decode Base64 and URL strings. Instant, private, in your browser.",
     "headline": "Markup and encoding tools for everyday development",
     "intro": "Small conversions interrupt real work all the time: turning a README into HTML for a CMS, cleaning pasted HTML down to Markdown, decoding a Base64 blob from a log, or fixing a query string that someone encoded twice. These tools accept pasted text or files, convert as you go, and show exactly what changed.",

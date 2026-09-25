@@ -34,7 +34,7 @@ faq:
   - q: "Are paragraphs kept?"
     a: >-
       Yes. Each paragraph ends with a blank line, so the structure of the text is preserved.
-  - q: "What happens to tables?"
+  - q: "What happens to tables in the Word document?"
     a: >-
       Each cell's text becomes its own paragraph, in reading order row by row. Use DOCX to HTML if you need tables.
   - q: "Does it work with .doc files?"

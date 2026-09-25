@@ -31,11 +31,11 @@ limitations:
   - >-
     Very large PNGs may be scaled down on iPhones and iPads due to Safari's canvas size limit; the tool warns you if so.
 faq:
-  - q: "What happens to the transparent background?"
+  - q: "What happens to transparent areas of my PNG?"
     a: >-
       It is filled with the background color from Settings — white unless you choose another. JPG has no way to store
       transparency.
-  - q: "How much smaller will the JPG be?"
+  - q: "How much smaller will the JPG be than the PNG?"
     a: >-
       For photos, commonly 70–90% smaller. For flat graphics with few colors the saving is smaller, and PNG may even be
       the better format.

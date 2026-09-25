@@ -14,7 +14,8 @@ async function build(): Promise<Map<string, Conversion>> {
   const missing = CONVERSIONS.filter((c) => !byId.has(c.slug)).map((c) => c.slug);
   if (missing.length) throw new Error(`[catalog] missing content for: ${missing.join(', ')}`);
   const orphans = entries.filter((e) => !CONVERSIONS.some((c) => c.slug === e.id)).map((e) => e.id);
-  if (orphans.length) throw new Error(`[catalog] content without catalog entry: ${orphans.join(', ')}`);
+  if (orphans.length)
+    throw new Error(`[catalog] content without catalog entry: ${orphans.join(', ')}`);
 
   return new Map(
     CONVERSIONS.map((meta) => {

@@ -55,13 +55,25 @@ export function formatTimestamp(ms: number, style: 'srt' | 'vtt' | 'ass' | 'txt'
   }
 }
 
-const ENTITY: Record<string, string> = { amp: '&', lt: '<', gt: '>', nbsp: ' ', lrm: '‎', rlm: '‏', quot: '"', apos: "'" };
+const ENTITY: Record<string, string> = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  nbsp: '\u00a0',
+  lrm: '\u200e',
+  rlm: '\u200f',
+  quot: '"',
+  apos: "'",
+};
 
 export function decodeEntities(s: string): string {
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (all, e: string) => {
     if (e[0] === '#') {
-      const code = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
-      return Number.isFinite(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : all;
+      const code =
+        e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return Number.isFinite(code) && code > 0 && code <= 0x10ffff
+        ? String.fromCodePoint(code)
+        : all;
     }
     return ENTITY[e.toLowerCase()] ?? all;
   });
@@ -72,15 +84,21 @@ export function decodeEntities(s: string): string {
  * Unknown tags are removed; their text content is kept.
  */
 export function normalizeMarkup(text: string, notes: Set<string>): string {
-  let out = text.replace(/<\s*(\/?)\s*([a-z0-9]+)(?:[.\s][^>]*)?>/gi, (_all, close: string, tag: string) => {
-    const t = tag.toLowerCase();
-    if (t === 'i' || t === 'b' || t === 'u') return `<${close}${t}>`;
-    if (t === 'font') notes.add('Font colors and faces were removed (the target format cannot express them).');
-    else if (t === 'v') notes.add('Speaker (voice) tags were removed; the spoken text is kept.');
-    else if (t === 'c' || t === 'lang' || t === 'span') notes.add('WebVTT class and language spans were removed; their text is kept.');
-    else if (t === 'ruby' || t === 'rt') notes.add('Ruby annotations were flattened into plain text.');
-    return '';
-  });
+  let out = text.replace(
+    /<(\/?)([a-z][a-z0-9]*)(?:[.\s][^<>]*)?>/gi,
+    (_all, close: string, tag: string) => {
+      const t = tag.toLowerCase();
+      if (t === 'i' || t === 'b' || t === 'u') return `<${close}${t}>`;
+      if (t === 'font')
+        notes.add('Font colors and faces were removed (the target format cannot express them).');
+      else if (t === 'v') notes.add('Speaker (voice) tags were removed; the spoken text is kept.');
+      else if (t === 'c' || t === 'lang' || t === 'span')
+        notes.add('WebVTT class and language spans were removed; their text is kept.');
+      else if (t === 'ruby' || t === 'rt')
+        notes.add('Ruby annotations were flattened into plain text.');
+      return '';
+    },
+  );
   // WebVTT inline timestamps (karaoke) <00:00:01.000>
   out = out.replace(/<\d{1,2}:\d{2}(?::\d{2})?\.\d{3}>/g, () => {
     notes.add('Inline karaoke timestamps were removed.');

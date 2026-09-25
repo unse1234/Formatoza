@@ -11,12 +11,32 @@ export const ENGINE_IDS = ['image', 'pdf', 'data', 'text', 'subtitles', 'documen
 export type EngineId = (typeof ENGINE_IDS)[number];
 
 export const FORMAT_IDS = [
-  'heic', 'avif', 'webp', 'jpg', 'png', 'svg', 'gif', 'bmp', 'tiff', 'ico',
-  'pdf', 'docx',
-  'csv', 'tsv', 'json', 'xml', 'yaml', 'xlsx',
-  'markdown', 'html', 'txt',
-  'base64', 'urlencoded',
-  'srt', 'vtt', 'ass',
+  'heic',
+  'avif',
+  'webp',
+  'jpg',
+  'png',
+  'svg',
+  'gif',
+  'bmp',
+  'tiff',
+  'ico',
+  'pdf',
+  'docx',
+  'csv',
+  'tsv',
+  'json',
+  'xml',
+  'yaml',
+  'xlsx',
+  'markdown',
+  'html',
+  'txt',
+  'base64',
+  'urlencoded',
+  'srt',
+  'vtt',
+  'ass',
 ] as const;
 export type FormatId = (typeof FORMAT_IDS)[number];
 

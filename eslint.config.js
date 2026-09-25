@@ -1,11 +1,12 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
+import { defineConfig } from 'eslint/config';
 import astro from 'eslint-plugin-astro';
 import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       'dist/',
@@ -15,6 +16,7 @@ export default tseslint.config(
       'test-results/',
       'playwright-report/',
       'tests/fixtures/',
+      'public/vendor/',
     ],
   },
   js.configs.recommended,
@@ -23,7 +25,10 @@ export default tseslint.config(
   {
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
       'no-eval': 'error',
       'no-implied-eval': 'error',
@@ -36,11 +41,17 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.flatConfigs.recommended.rules,
+      // Scrollable output panes (<pre>) must be keyboard-focusable (WCAG 2.1.1).
+      'jsx-a11y/no-noninteractive-tabindex': ['error', { tags: ['pre'], roles: ['tabpanel'] }],
     },
   },
   {
     // Architectural boundary: UI never talks to conversion libraries directly.
-    files: ['src/components/**/*.{ts,tsx,astro}', 'src/pages/**/*.{ts,astro}', 'src/layouts/**/*.astro'],
+    files: [
+      'src/components/**/*.{ts,tsx,astro}',
+      'src/pages/**/*.{ts,astro}',
+      'src/layouts/**/*.astro',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -61,7 +72,8 @@ export default tseslint.config(
                 '@jsquash/*',
                 'fflate',
               ],
-              message: 'UI code must go through src/engines (ConverterEngine) or src/lib, never a conversion library.',
+              message:
+                'UI code must go through src/engines (ConverterEngine) or src/lib, never a conversion library.',
             },
           ],
         },

@@ -38,7 +38,7 @@ faq:
   - q: "Can I keep the links?"
     a: >-
       Yes. Enable “Keep link URLs in parentheses” to get “our pricing (https://example.com/pricing)”.
-  - q: "What happens to tables?"
+  - q: "How are HTML tables converted to text?"
     a: >-
       Each row becomes a line, with cells separated by tab characters, so you can paste the result into a spreadsheet.
   - q: "Is it safe to paste HTML from unknown sources?"

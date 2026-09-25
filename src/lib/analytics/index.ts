@@ -7,7 +7,8 @@
 import type { EngineId } from '~/lib/catalog/types';
 import type { ErrorCode } from '~/engines/types';
 
-export type AnalyticsEvent = 'convert_start' | 'convert_complete' | 'convert_cancel' | 'download' | 'copy';
+export type AnalyticsEvent =
+  'convert_start' | 'convert_complete' | 'convert_cancel' | 'download' | 'copy';
 
 export interface AnalyticsProps {
   tool?: string;
@@ -27,11 +28,28 @@ const ENUMS: { [K in keyof AnalyticsProps]-?: readonly string[] | RegExp } = {
   files: ['1', '2-5', '6-20', '21+'],
   size: ['<1MB', '1-10MB', '10-50MB', '50MB+'],
   duration: ['<1s', '1-5s', '5-30s', '30s+'],
-  errorCode: ['EMPTY_INPUT', 'UNSUPPORTED_FORMAT', 'FILE_TOO_LARGE', 'TOO_MANY_FILES', 'MALFORMED_INPUT', 'BROWSER_UNSUPPORTED', 'LIMIT_EXCEEDED', 'ENCRYPTED', 'ABORTED', 'INTERNAL'],
+  errorCode: [
+    'EMPTY_INPUT',
+    'UNSUPPORTED_FORMAT',
+    'FILE_TOO_LARGE',
+    'TOO_MANY_FILES',
+    'MALFORMED_INPUT',
+    'BROWSER_UNSUPPORTED',
+    'LIMIT_EXCEEDED',
+    'ENCRYPTED',
+    'ABORTED',
+    'INTERNAL',
+  ],
   inputMode: ['file', 'paste'],
 };
 
-const EVENTS: readonly AnalyticsEvent[] = ['convert_start', 'convert_complete', 'convert_cancel', 'download', 'copy'];
+const EVENTS: readonly AnalyticsEvent[] = [
+  'convert_start',
+  'convert_complete',
+  'convert_cancel',
+  'download',
+  'copy',
+];
 
 /** Drops every key/value that is not an explicitly allowed enum value. */
 export function sanitizeProps(raw: Record<string, unknown>): AnalyticsProps {

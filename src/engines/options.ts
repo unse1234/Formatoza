@@ -47,7 +47,8 @@ export interface ColorField extends BaseField {
   type: 'color';
   default: string;
 }
-export type OptionField = SelectField | RangeField | NumberField | BooleanField | TextField | ColorField;
+export type OptionField =
+  SelectField | RangeField | NumberField | BooleanField | TextField | ColorField;
 export type OptionValue = string | number | boolean;
 export type OptionValues = Record<string, OptionValue>;
 
@@ -60,7 +61,9 @@ const quality = (def: number, help?: string): RangeField => ({
   step: 1,
   default: def,
   unit: '%',
-  help: help ?? 'Higher keeps more detail and makes larger files. 85–92 is visually lossless for most photos.',
+  help:
+    help ??
+    'Higher keeps more detail and makes larger files. 85–92 is visually lossless for most photos.',
 });
 
 const background: ColorField = {
@@ -167,7 +170,9 @@ function imageFields(from: FormatId, to: FormatId): OptionField[] {
     });
   if (to === 'jpg') fields.push(quality(90), background);
   if (to === 'webp')
-    fields.push(quality(85, 'WebP at 80–90 is typically much smaller than JPG at similar visual quality.'));
+    fields.push(
+      quality(85, 'WebP at 80–90 is typically much smaller than JPG at similar visual quality.'),
+    );
   return fields;
 }
 
@@ -210,12 +215,23 @@ function pdfFields(from: FormatId, to: FormatId): OptionField[] {
       },
     ];
     if (from === 'webp' || from === 'heic')
-      f.push(quality(92, 'These images are re-encoded as JPEG inside the PDF (PDF has no WebP/HEIC support).'));
+      f.push(
+        quality(
+          92,
+          'These images are re-encoded as JPEG inside the PDF (PDF has no WebP/HEIC support).',
+        ),
+      );
     return f;
   }
   if (to === 'txt')
     return [
-      { key: 'pageBreaks', label: 'Mark page breaks', type: 'boolean', default: true, help: 'Adds a “— Page N —” line between pages.' },
+      {
+        key: 'pageBreaks',
+        label: 'Mark page breaks',
+        type: 'boolean',
+        default: true,
+        help: 'Adds a “— Page N —” line between pages.',
+      },
     ];
   const f: OptionField[] = [
     {
@@ -261,7 +277,12 @@ function dataFields(from: FormatId, to: FormatId): OptionField[] {
       default: 'auto',
     });
   if (from === 'csv' || from === 'tsv') {
-    f.push({ key: 'header', label: 'First row contains column names', type: 'boolean', default: true });
+    f.push({
+      key: 'header',
+      label: 'First row contains column names',
+      type: 'boolean',
+      default: true,
+    });
     if (to !== 'csv' && to !== 'tsv')
       f.push({
         key: 'typed',
@@ -279,7 +300,10 @@ function dataFields(from: FormatId, to: FormatId): OptionField[] {
       default: false,
       help: 'A column named address.city becomes { "address": { "city": … } }.',
     });
-  if ((from === 'json' || from === 'xml' || from === 'yaml') && (to === 'csv' || to === 'tsv' || to === 'xlsx'))
+  if (
+    (from === 'json' || from === 'xml' || from === 'yaml') &&
+    (to === 'csv' || to === 'tsv' || to === 'xlsx')
+  )
     f.push({
       key: 'flatten',
       label: 'Flatten nested objects into columns',
@@ -329,11 +353,27 @@ function dataFields(from: FormatId, to: FormatId): OptionField[] {
       help: 'Prefixes values starting with = + - @ with an apostrophe so spreadsheets don’t execute them.',
     });
   if (to === 'json') f.push(indent('2'));
-  if (to === 'yaml') f.push({ ...indent('2'), choices: indent().choices.filter((c) => c.value === '2' || c.value === '4') });
+  if (to === 'yaml')
+    f.push({
+      ...indent('2'),
+      choices: indent().choices.filter((c) => c.value === '2' || c.value === '4'),
+    });
   if (to === 'xml') {
     f.push(
-      { key: 'rootName', label: 'Root element name', type: 'text', default: from === 'csv' || from === 'tsv' ? 'rows' : 'root', maxLength: 60 },
-      { key: 'itemName', label: 'Record / list item element name', type: 'text', default: from === 'csv' || from === 'tsv' ? 'row' : 'item', maxLength: 60 },
+      {
+        key: 'rootName',
+        label: 'Root element name',
+        type: 'text',
+        default: from === 'csv' || from === 'tsv' ? 'rows' : 'root',
+        maxLength: 60,
+      },
+      {
+        key: 'itemName',
+        label: 'Record / list item element name',
+        type: 'text',
+        default: from === 'csv' || from === 'tsv' ? 'row' : 'item',
+        maxLength: 60,
+      },
       { ...indent('2'), choices: indent().choices.filter((c) => c.value !== 'tab') },
     );
   }
@@ -349,7 +389,12 @@ function dataFields(from: FormatId, to: FormatId): OptionField[] {
         ],
         default: 'sheets',
       },
-      { key: 'styleHeader', label: 'Bold and freeze the header row', type: 'boolean', default: true },
+      {
+        key: 'styleHeader',
+        label: 'Bold and freeze the header row',
+        type: 'boolean',
+        default: true,
+      },
     );
   return f;
 }
@@ -359,9 +404,19 @@ function textFields(from: FormatId, to: FormatId): OptionField[] {
   switch (key) {
     case 'markdown>html':
       return [
-        { key: 'gfm', label: 'GitHub Flavored Markdown (tables, task lists, strikethrough)', type: 'boolean', default: true },
+        {
+          key: 'gfm',
+          label: 'GitHub Flavored Markdown (tables, task lists, strikethrough)',
+          type: 'boolean',
+          default: true,
+        },
         { key: 'breaks', label: 'Single line breaks become <br>', type: 'boolean', default: false },
-        { key: 'fullDocument', label: 'Wrap in a complete HTML document', type: 'boolean', default: false },
+        {
+          key: 'fullDocument',
+          label: 'Wrap in a complete HTML document',
+          type: 'boolean',
+          default: false,
+        },
       ];
     case 'html>markdown':
       return [
@@ -388,20 +443,52 @@ function textFields(from: FormatId, to: FormatId): OptionField[] {
       ];
     case 'html>txt':
       return [
-        { key: 'keepLinks', label: 'Keep link URLs in parentheses', type: 'boolean', default: false },
-        { key: 'keepImagesAlt', label: 'Keep image descriptions (alt text)', type: 'boolean', default: false },
+        {
+          key: 'keepLinks',
+          label: 'Keep link URLs in parentheses',
+          type: 'boolean',
+          default: false,
+        },
+        {
+          key: 'keepImagesAlt',
+          label: 'Keep image descriptions (alt text)',
+          type: 'boolean',
+          default: false,
+        },
       ];
     case 'markdown>txt':
-      return [{ key: 'keepLinks', label: 'Keep link URLs in parentheses', type: 'boolean', default: false }];
+      return [
+        {
+          key: 'keepLinks',
+          label: 'Keep link URLs in parentheses',
+          type: 'boolean',
+          default: false,
+        },
+      ];
     case 'txt>base64':
       return [
-        { key: 'urlSafe', label: 'URL-safe alphabet (- and _ , no padding)', type: 'boolean', default: false },
-        { key: 'wrap', label: 'Wrap lines at 76 characters (MIME)', type: 'boolean', default: false },
+        {
+          key: 'urlSafe',
+          label: 'URL-safe alphabet (- and _ , no padding)',
+          type: 'boolean',
+          default: false,
+        },
+        {
+          key: 'wrap',
+          label: 'Wrap lines at 76 characters (MIME)',
+          type: 'boolean',
+          default: false,
+        },
       ];
     case 'json>base64':
       return [
         { key: 'minify', label: 'Minify JSON before encoding', type: 'boolean', default: true },
-        { key: 'urlSafe', label: 'URL-safe alphabet (- and _ , no padding)', type: 'boolean', default: false },
+        {
+          key: 'urlSafe',
+          label: 'URL-safe alphabet (- and _ , no padding)',
+          type: 'boolean',
+          default: false,
+        },
       ];
     case 'base64>json':
       return [indent('2')];
@@ -417,13 +504,23 @@ function textFields(from: FormatId, to: FormatId): OptionField[] {
           ],
           default: 'component',
         },
-        { key: 'spacePlus', label: 'Encode spaces as + (HTML form style)', type: 'boolean', default: false },
+        {
+          key: 'spacePlus',
+          label: 'Encode spaces as + (HTML form style)',
+          type: 'boolean',
+          default: false,
+        },
         { key: 'perLine', label: 'Encode each line separately', type: 'boolean', default: false },
       ];
     case 'urlencoded>txt':
       return [
         { key: 'plusAsSpace', label: 'Treat + as a space', type: 'boolean', default: true },
-        { key: 'repeat', label: 'Decode repeatedly until stable (fixes %2520)', type: 'boolean', default: false },
+        {
+          key: 'repeat',
+          label: 'Decode repeatedly until stable (fixes %2520)',
+          type: 'boolean',
+          default: false,
+        },
       ];
     default:
       return [];
@@ -456,7 +553,16 @@ function subtitleFields(from: FormatId, to: FormatId): OptionField[] {
   if (to === 'ass')
     f.push(
       { key: 'fontName', label: 'Font', type: 'text', default: 'Arial', maxLength: 60 },
-      { key: 'fontSize', label: 'Font size', type: 'number', min: 8, max: 200, step: 1, default: 56, unit: 'px' },
+      {
+        key: 'fontSize',
+        label: 'Font size',
+        type: 'number',
+        min: 8,
+        max: 200,
+        step: 1,
+        default: 56,
+        unit: 'px',
+      },
       {
         key: 'resolution',
         label: 'Script resolution (PlayRes)',
@@ -485,7 +591,12 @@ function documentFields(_from: FormatId, to: FormatId): OptionField[] {
         ],
         default: 'embed',
       },
-      { key: 'fullDocument', label: 'Wrap in a complete HTML document', type: 'boolean', default: true },
+      {
+        key: 'fullDocument',
+        label: 'Wrap in a complete HTML document',
+        type: 'boolean',
+        default: true,
+      },
     ];
   return [];
 }
@@ -515,7 +626,10 @@ export function defaultOptionValues(fields: OptionField[]): OptionValues {
  * Coerces untrusted option input into valid values: unknown keys dropped,
  * numbers clamped, select values checked, colors validated.
  */
-export function resolveOptions(fields: OptionField[], raw: Partial<OptionValues> | undefined): OptionValues {
+export function resolveOptions(
+  fields: OptionField[],
+  raw: Partial<OptionValues> | undefined,
+): OptionValues {
   const out: OptionValues = {};
   for (const f of fields) {
     const v = raw?.[f.key];
@@ -525,7 +639,8 @@ export function resolveOptions(fields: OptionField[], raw: Partial<OptionValues>
         break;
       case 'range':
       case 'number': {
-        const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+        const n =
+          typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
         out[f.key] = Number.isFinite(n) ? Math.min(f.max, Math.max(f.min, n)) : f.default;
         break;
       }
@@ -536,7 +651,8 @@ export function resolveOptions(fields: OptionField[], raw: Partial<OptionValues>
         out[f.key] = typeof v === 'string' ? v.slice(0, f.maxLength) : f.default;
         break;
       case 'color':
-        out[f.key] = typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : f.default;
+        out[f.key] =
+          typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : f.default;
         break;
     }
   }
@@ -545,5 +661,7 @@ export function resolveOptions(fields: OptionField[], raw: Partial<OptionValues>
 
 export function isFieldVisible(field: OptionField, values: OptionValues): boolean {
   if (!field.visibleWhen) return true;
-  return field.visibleWhen.oneOf.includes(values[field.visibleWhen.key] as string | number | boolean);
+  return field.visibleWhen.oneOf.includes(
+    values[field.visibleWhen.key] as string | number | boolean,
+  );
 }

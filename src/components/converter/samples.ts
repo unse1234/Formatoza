@@ -19,8 +19,11 @@ export const SAMPLES: Partial<Record<FormatId, string>> = {
 };
 
 export function sampleFor(from: FormatId, to: FormatId): string | undefined {
-  if (from === 'json' && to === 'base64') return `{"user":"ana","roles":["admin"],"exp":1767225600}`;
-  if (from === 'base64' && to === 'json') return 'eyJ1c2VyIjoiYW5hIiwicm9sZXMiOlsiYWRtaW4iXSwiZXhwIjoxNzY3MjI1NjAwfQ==';
-  if (from === 'txt' && to === 'urlencoded') return 'https://example.com/search?q=café au lait&lang=fr';
+  if (from === 'json' && to === 'base64')
+    return `{"user":"ana","roles":["admin"],"exp":1767225600}`;
+  if (from === 'base64' && to === 'json')
+    return 'eyJ1c2VyIjoiYW5hIiwicm9sZXMiOlsiYWRtaW4iXSwiZXhwIjoxNzY3MjI1NjAwfQ==';
+  if (from === 'txt' && to === 'urlencoded')
+    return 'https://example.com/search?q=café au lait&lang=fr';
   return SAMPLES[from];
 }

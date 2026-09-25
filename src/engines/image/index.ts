@@ -3,12 +3,28 @@ import { dedupeNames, outputFileName } from '~/lib/file/filename';
 import { getOptionFields, resolveOptions } from '../options';
 import { OUTPUT_TYPE, matchesFormat } from '../shared/extensions';
 import { runPerFile, throwIfAborted, validateFiles, warning } from '../shared/engine-utils';
-import { ConversionError, type ConversionIssue, type ConverterEngine, type OutputFile } from '../types';
+import {
+  ConversionError,
+  type ConversionIssue,
+  type ConverterEngine,
+  type OutputFile,
+} from '../types';
 import { closeSource, drawToCanvas, encodeCanvas, planSize, type RasterTarget } from './canvas';
 import { decodeImage } from './decode';
 import { fitWithin } from './inspect';
 
-const SOURCES: FormatId[] = ['heic', 'avif', 'webp', 'jpg', 'png', 'svg', 'gif', 'bmp', 'tiff', 'ico'];
+const SOURCES: FormatId[] = [
+  'heic',
+  'avif',
+  'webp',
+  'jpg',
+  'png',
+  'svg',
+  'gif',
+  'bmp',
+  'tiff',
+  'ico',
+];
 const TARGETS: FormatId[] = ['jpg', 'png', 'webp'];
 
 export const imageEngine: ConverterEngine = {
@@ -22,9 +38,15 @@ export const imageEngine: ConverterEngine = {
 
   async convert(input, rawOptions, ctx) {
     if (!SOURCES.includes(input.from) || !TARGETS.includes(input.to))
-      throw new ConversionError('UNSUPPORTED_FORMAT', `${input.from} → ${input.to} is not supported.`);
+      throw new ConversionError(
+        'UNSUPPORTED_FORMAT',
+        `${input.from} → ${input.to} is not supported.`,
+      );
     if (typeof createImageBitmap === 'undefined')
-      throw new ConversionError('BROWSER_UNSUPPORTED', 'Your browser does not support in-page image processing. Please update it.');
+      throw new ConversionError(
+        'BROWSER_UNSUPPORTED',
+        'Your browser does not support in-page image processing. Please update it.',
+      );
     const o = resolveOptions(getOptionFields('image', input.from, input.to), rawOptions);
     const target = input.to as RasterTarget;
     const out = OUTPUT_TYPE[input.to];
@@ -47,8 +69,17 @@ export const imageEngine: ConverterEngine = {
           const wanted = fitWithin(frame.width, frame.height, maxSide);
           const plan = planSize(wanted.width, wanted.height);
           if (plan.limited)
-            warnings.push(warning(`The image was reduced to ${plan.width} × ${plan.height} to stay within this browser's canvas limits.`));
-          const canvas = drawToCanvas(frame.source, plan.width, plan.height, target === 'jpg' ? String(o['background'] ?? '#ffffff') : undefined);
+            warnings.push(
+              warning(
+                `The image was reduced to ${plan.width} × ${plan.height} to stay within this browser's canvas limits.`,
+              ),
+            );
+          const canvas = drawToCanvas(
+            frame.source,
+            plan.width,
+            plan.height,
+            target === 'jpg' ? String(o['background'] ?? '#ffffff') : undefined,
+          );
           const blob = await encodeCanvas(canvas, target, quality);
           outputs.push({
             name: outputFileName(file.name, out.ext, frame.suffix),

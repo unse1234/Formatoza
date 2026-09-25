@@ -23,19 +23,35 @@ function probeImage(src: string): Promise<boolean> {
 }
 
 export async function checkCapabilities(c: ClientConversion): Promise<Capability> {
-  if (typeof Blob === 'undefined' || typeof File === 'undefined' || typeof URL.createObjectURL !== 'function')
-    return { ok: false, message: 'Your browser is missing basic file APIs needed for in-browser conversion. Please update it.' };
+  if (
+    typeof Blob === 'undefined' ||
+    typeof File === 'undefined' ||
+    typeof URL.createObjectURL !== 'function'
+  )
+    return {
+      ok: false,
+      message:
+        'Your browser is missing basic file APIs needed for in-browser conversion. Please update it.',
+    };
   if ((c.engine === 'image' || c.engine === 'pdf') && typeof createImageBitmap === 'undefined')
-    return { ok: false, message: 'Your browser cannot process images in the page (createImageBitmap is missing). Please update to a current browser.' };
+    return {
+      ok: false,
+      message:
+        'Your browser cannot process images in the page (createImageBitmap is missing). Please update to a current browser.',
+    };
   if (c.from === 'avif' && !(await probeImage(AVIF_PROBE)))
     return {
       ok: false,
-      message: 'This browser cannot decode AVIF images, so they cannot be converted here. AVIF works in current Chrome, Edge, Firefox (93+) and Safari (16.4+).',
+      message:
+        'This browser cannot decode AVIF images, so they cannot be converted here. AVIF works in current Chrome, Edge, Firefox (93+) and Safari (16.4+).',
     };
   return { ok: true };
 }
 
 /** Formats a browser can show in an <img> without any decoder of ours. */
 export function canPreviewNatively(mime: string, name: string): boolean {
-  return /^image\/(jpeg|png|gif|webp|avif|bmp|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(mime) || /\.(jpe?g|png|gif|webp|avif|bmp|svg|ico)$/i.test(name);
+  return (
+    /^image\/(jpeg|png|gif|webp|avif|bmp|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(mime) ||
+    /\.(jpe?g|png|gif|webp|avif|bmp|svg|ico)$/i.test(name)
+  );
 }

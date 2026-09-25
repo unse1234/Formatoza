@@ -44,7 +44,7 @@ faq:
     a: >-
       If the JSON is an object with a single key whose value is an object, that key becomes the root. Otherwise
       everything is wrapped in <root>, which you can rename.
-  - q: "Are special characters escaped?"
+  - q: "Are characters like & and < escaped in the XML?"
     a: >-
       Yes — &, < and > in values are escaped, and characters XML 1.0 forbids are removed.
 ---

@@ -26,8 +26,12 @@ export async function readText(file: Blob): Promise<DecodedText> {
 }
 
 export function textBlob(text: string, mimeType: string, bom = false): Blob {
-  const type = mimeType.startsWith('text/') || mimeType.includes('json') || mimeType.includes('xml') || mimeType.includes('yaml')
-    ? `${mimeType};charset=utf-8`
-    : mimeType;
-  return new Blob(bom ? ['﻿', text] : [text], { type });
+  const type =
+    mimeType.startsWith('text/') ||
+    mimeType.includes('json') ||
+    mimeType.includes('xml') ||
+    mimeType.includes('yaml')
+      ? `${mimeType};charset=utf-8`
+      : mimeType;
+  return new Blob(bom ? ['\ufeff', text] : [text], { type });
 }

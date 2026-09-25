@@ -9,7 +9,8 @@ const encoder = new TextEncoder();
 export function bytesToBase64(bytes: Uint8Array): string {
   let binary = '';
   const CHUNK = 0x8000;
-  for (let i = 0; i < bytes.length; i += CHUNK) binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  for (let i = 0; i < bytes.length; i += CHUNK)
+    binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
   return btoa(binary);
 }
 
@@ -46,10 +47,21 @@ export function decodeBase64(input: string): DecodedBase64 {
   if (urlSafe) s = s.replace(/-/g, '+').replace(/_/g, '/');
   const bad = /[^A-Za-z0-9+/=]/.exec(s);
   if (bad)
-    throw new ConversionError('MALFORMED_INPUT', `“${bad[0]}” at position ${bad.index + 1} is not a Base64 character. Base64 only uses A–Z, a–z, 0–9, + and / (or - and _).`);
-  if (/=[^=]/.test(s) || /={3,}$/.test(s)) throw new ConversionError('MALFORMED_INPUT', 'Padding “=” can only appear at the very end (at most two).');
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      `“${bad[0]}” at position ${bad.index + 1} is not a Base64 character. Base64 only uses A–Z, a–z, 0–9, + and / (or - and _).`,
+    );
+  if (/=[^=]/.test(s) || /={3,}$/.test(s))
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      'Padding “=” can only appear at the very end (at most two).',
+    );
   const unpadded = s.replace(/=+$/, '');
-  if (unpadded.length % 4 === 1) throw new ConversionError('MALFORMED_INPUT', 'The Base64 input is truncated: its length cannot come from whole bytes.');
+  if (unpadded.length % 4 === 1)
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      'The Base64 input is truncated: its length cannot come from whole bytes.',
+    );
   const paddingAdded = s.length % 4 !== 0;
   const padded = unpadded + '='.repeat((4 - (unpadded.length % 4)) % 4);
   const binary = atob(padded);
@@ -65,7 +77,7 @@ export function bytesAsText(bytes: Uint8Array): string | null {
     // eslint-disable-next-line no-control-regex
     const controls = (text.match(/[\u0000-\u0008\u000e-\u001f]/g) ?? []).length;
     if (controls > Math.max(2, text.length * 0.01)) return null;
-    return text.replace(/^﻿/, '');
+    return text.replace(/^\ufeff/, '');
   } catch {
     return null;
   }
@@ -74,7 +86,10 @@ export function bytesAsText(bytes: Uint8Array): string | null {
 // RFC 3986 unreserved characters are never encoded; encodeURIComponent also
 // leaves !'()* alone, which RFC 3986 treats as reserved sub-delims.
 function strictComponent(s: string): string {
-  return encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+  return encodeURIComponent(s).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
 }
 
 export interface UrlEncodeOptions {
@@ -116,7 +131,10 @@ function decodeOnce(input: string, plusAsSpace: boolean): { text: string; invali
   return { text, invalid };
 }
 
-export function urlDecode(input: string, o: { plusAsSpace: boolean; repeat: boolean }): UrlDecodeResult {
+export function urlDecode(
+  input: string,
+  o: { plusAsSpace: boolean; repeat: boolean },
+): UrlDecodeResult {
   let current = input;
   let invalidSequences = 0;
   let passes = 0;

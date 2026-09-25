@@ -31,7 +31,10 @@ export function ProgressBar({ fraction, label, onCancel }: Props) {
           {indeterminate ? (
             <div className="h-full w-2/5 rounded-full bg-fg [animation:fz-indeterminate_1.1s_ease-in-out_infinite]" />
           ) : (
-            <div className="h-full rounded-full bg-fg transition-[width] duration-300 ease-out" style={{ width: `${pct}%` }} />
+            <div
+              className="h-full rounded-full bg-fg transition-[width] duration-300 ease-out"
+              style={{ width: `${pct}%` }}
+            />
           )}
         </div>
       </div>

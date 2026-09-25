@@ -57,7 +57,14 @@ export function locateJsonError(s: string): { pos: number; reason: string } | nu
       }
       for (;;) {
         ws();
-        if (s[i] !== '"') fail(s[i] === "'" ? 'keys must use double quotes' : s[i] === '}' ? 'trailing comma before }' : 'expected a quoted property name');
+        if (s[i] !== '"')
+          fail(
+            s[i] === "'"
+              ? 'keys must use double quotes'
+              : s[i] === '}'
+                ? 'trailing comma before }'
+                : 'expected a quoted property name',
+          );
         str();
         ws();
         if (s[i] !== ':') fail('expected “:” after the property name');
@@ -101,9 +108,11 @@ export function locateJsonError(s: string): { pos: number; reason: string } | nu
     if (c === '"') return str();
     if (c === "'") fail('strings must use double quotes');
     if (c === '-' || (c !== undefined && c >= '0' && c <= '9')) return num();
-    for (const lit of ['true', 'false', 'null']) if (s.startsWith(lit, i)) return void (i += lit.length);
+    for (const lit of ['true', 'false', 'null'])
+      if (s.startsWith(lit, i)) return void (i += lit.length);
     if (c === undefined) fail('unexpected end of input');
-    if (c === '/' && (s[i + 1] === '/' || s[i + 1] === '*')) fail('comments are not allowed in JSON');
+    if (c === '/' && (s[i + 1] === '/' || s[i + 1] === '*'))
+      fail('comments are not allowed in JSON');
     fail(`unexpected character “${c}”`);
   };
   try {
@@ -118,8 +127,11 @@ export function locateJsonError(s: string): { pos: number; reason: string } | nu
 }
 
 /** JSON.parse with consistent, readable errors (line/column) and a JSON Lines fallback. */
-export function parseJson(text: string, opts: { allowJsonLines?: boolean } = {}): { value: unknown; warnings: ConversionIssue[] } {
-  const input = text.replace(/^﻿/, '').trim();
+export function parseJson(
+  text: string,
+  opts: { allowJsonLines?: boolean } = {},
+): { value: unknown; warnings: ConversionIssue[] } {
+  const input = text.replace(/^\ufeff/, '').trim();
   if (!input) throw new ConversionError('EMPTY_INPUT', 'The input is empty.');
   try {
     return { value: JSON.parse(input) as unknown, warnings: [] };
@@ -129,7 +141,10 @@ export function parseJson(text: string, opts: { allowJsonLines?: boolean } = {})
       if (lines.length > 1) {
         try {
           const values = lines.map((l) => JSON.parse(l) as unknown);
-          return { value: values, warnings: [warning(`Read as JSON Lines: ${lines.length} records, one per line.`)] };
+          return {
+            value: values,
+            warnings: [warning(`Read as JSON Lines: ${lines.length} records, one per line.`)],
+          };
         } catch {
           /* fall through to the original error */
         }
@@ -138,8 +153,14 @@ export function parseJson(text: string, opts: { allowJsonLines?: boolean } = {})
     const located = locateJsonError(input);
     if (located) {
       const { line, col } = lineCol(input, located.pos);
-      throw new ConversionError('MALFORMED_INPUT', `Invalid JSON at line ${line}, column ${col}: ${located.reason}.`);
+      throw new ConversionError(
+        'MALFORMED_INPUT',
+        `Invalid JSON at line ${line}, column ${col}: ${located.reason}.`,
+      );
     }
-    throw new ConversionError('MALFORMED_INPUT', `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`);
+    throw new ConversionError(
+      'MALFORMED_INPUT',
+      `Invalid JSON: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 }

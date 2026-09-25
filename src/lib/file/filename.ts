@@ -6,8 +6,9 @@
 
 const WINDOWS_RESERVED = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i;
 // Control chars, bidi/format controls and characters invalid on Windows/macOS.
-// eslint-disable-next-line no-control-regex
-const UNSAFE_CHARS = /[\u0000-\u001f\u007f-\u009f​-‏‪-‮⁦-⁩﻿<>:"/\\|?*]/g;
+const UNSAFE_CHARS =
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point
+  /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff<>:"/\\|?*]/g;
 const MAX_BASE_LENGTH = 120;
 
 /** Strips any directory part and the final extension. */

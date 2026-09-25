@@ -79,7 +79,11 @@ export interface ConverterEngine {
   runsLocally: true;
   canProcess(file: File, from: FormatId): boolean;
   validate(input: ConversionInput, limits: ConversionLimits): ValidationResult;
-  convert(input: ConversionInput, options?: Partial<OptionValues>, context?: ConversionContext): Promise<ConversionResult>;
+  convert(
+    input: ConversionInput,
+    options?: Partial<OptionValues>,
+    context?: ConversionContext,
+  ): Promise<ConversionResult>;
 }
 
 export class ConversionError extends Error {

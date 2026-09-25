@@ -21,7 +21,13 @@ const crumbs = [
   { name: guide.data.h1, path },
 ];
 const tools = guide.data.tools.map(getConversionMeta);
-const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
 const toc = headings.filter((h) => h.depth === 2);
 ---
 
@@ -38,7 +44,13 @@ const toc = headings.filter((h) => h.depth === 2);
     organization(),
     website(),
     breadcrumbList(crumbs),
-    article({ title: guide.data.h1, description: guide.data.metaDescription, path, published: guide.data.published, updated: guide.data.updated }),
+    article({
+      title: guide.data.h1,
+      description: guide.data.metaDescription,
+      path,
+      published: guide.data.published,
+      updated: guide.data.updated,
+    }),
   )}
   ads
 >
@@ -51,7 +63,10 @@ const toc = headings.filter((h) => h.depth === 2);
           <h1 class="t-display mt-3">{guide.data.h1}</h1>
           <p class="mt-5 text-lg leading-relaxed text-fg-2">{guide.data.summary}</p>
           <p class="mt-4 text-[13px] text-fg-3">
-            By the Formatoza team · Updated <time datetime={guide.data.updated.toISOString().slice(0, 10)}>{fmt(guide.data.updated)}</time>
+            By the Formatoza team · Updated{' '}
+            <time datetime={guide.data.updated.toISOString().slice(0, 10)}>
+              {fmt(guide.data.updated)}
+            </time>
           </p>
         </header>
         <div class="prose-fz mt-10">
@@ -61,13 +76,23 @@ const toc = headings.filter((h) => h.depth === 2);
       </article>
       <aside class="hidden lg:block" aria-label="Guide navigation">
         <nav class="sticky top-[calc(var(--header-h)+24px)]" aria-labelledby="g-toc">
-          <p id="g-toc" class="t-eyebrow">In this guide</p>
+          <p id="g-toc" class="t-eyebrow">
+            In this guide
+          </p>
           <ul class="mt-3 grid gap-2 text-[13px]">
-            {toc.map((h) => <li><a href={`#${h.slug}`} class="text-fg-2 hover:text-fg">{h.text}</a></li>)}
+            {toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`} class="text-fg-2 hover:text-fg">
+                  {h.text}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       </aside>
     </div>
-    <div class="mt-16"><RelatedTools tools={tools} title="Converters mentioned in this guide" /></div>
+    <div class="mt-16">
+      <RelatedTools tools={tools} title="Converters mentioned in this guide" />
+    </div>
   </div>
 </BaseLayout>
